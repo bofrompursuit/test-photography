@@ -9,7 +9,7 @@ import { mountConnect } from "./connect/mount.jsx";
 gsap.registerPlugin(ScrollTrigger);
 
 // Seconds into intro.mp4 at which the name card lands — tune to match the cut.
-const HERO_REVEAL_AT_SECONDS = 7.2;
+const HERO_REVEAL_AT_SECONDS = 8.3;
 // If the video never starts (blocked autoplay, missing file, no codec support),
 // the hero copy still has to appear.
 const HERO_REVEAL_FALLBACK_MS = 3000;
