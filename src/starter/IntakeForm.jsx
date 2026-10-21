@@ -185,7 +185,7 @@ export default function IntakeForm() {
   return (
     <div
       ref={cardRef}
-      className="scroll-mt-[calc(var(--header-h)+20px)] rounded-3xl border border-white/[0.08] bg-[var(--surface)] p-[clamp(18px,4.5vw,48px)]"
+      className="scroll-mt-[calc(var(--header-h)+20px)] rounded-3xl border border-white/[0.09] bg-[rgba(19,19,22,0.86)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7),inset_0_1px_0_rgba(255,255,255,0.05)] p-[clamp(18px,4.5vw,48px)]"
     >
       <p className="sr-only" aria-live="polite" aria-atomic="true">
         {announcement}

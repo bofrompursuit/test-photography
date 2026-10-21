@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import IntakeForm from "./IntakeForm";
+import AmbientField from "./AmbientField";
 import { FAQ, NEXT, SECTION } from "./config";
 
 function Eyebrow({ children }) {
@@ -78,46 +79,53 @@ export default function StarterProjectSection() {
 
   return (
     <div ref={rootRef}>
-      <header className="max-w-4xl">
-        <Eyebrow>{SECTION.eyebrow}</Eyebrow>
-        <AccentTitle title={SECTION.title} />
-        <p className="mt-4 max-w-2xl text-[clamp(0.95rem,1.6vw,1.125rem)] leading-relaxed text-white/55 sm:mt-6">{SECTION.intro}</p>
-      </header>
+      {/* Positioned against the section itself, behind everything below. */}
+      <AmbientField />
 
-      <div className="mt-[clamp(24px,5vh,56px)] max-w-[880px]">
-        <IntakeForm />
-      </div>
+      <div className="relative z-[1]">
+        <header className="relative max-w-4xl">
+          {/* Keeps strands from cutting through the headline and intro. */}
+          <div aria-hidden="true" className="starter-text-shield" />
+          <Eyebrow>{SECTION.eyebrow}</Eyebrow>
+          <AccentTitle title={SECTION.title} />
+          <p className="mt-4 max-w-2xl text-[clamp(0.95rem,1.6vw,1.125rem)] leading-relaxed text-white/55 sm:mt-6">{SECTION.intro}</p>
+        </header>
 
-      {/* "What happens next" and the FAQ share one accordion, so the section
-          ends in a few short lines instead of two more full-height blocks. */}
-      <div className="mt-[clamp(48px,9vh,104px)] grid grid-cols-1 gap-5 lg:grid-cols-[1fr_1.3fr] lg:gap-16">
-        <div>
-          <Eyebrow>{FAQ.eyebrow}</Eyebrow>
-          <h2 className="text-[clamp(1.5rem,3.4vw,2.5rem)] font-semibold leading-[1.08] tracking-tight text-white">
-            {FAQ.title}
-          </h2>
+        <div className="mt-[clamp(24px,5vh,56px)] max-w-[880px]">
+          <IntakeForm />
         </div>
-        <div className="border-t border-white/10">
-          <FaqItem question={NEXT.question} index={0}>
-            <ol className="space-y-4">
-              {NEXT.items.map((item) => (
-                <li key={item.n} className="grid grid-cols-[2rem_1fr] gap-x-2">
-                  <span className="pt-0.5 text-xs font-semibold tabular-nums tracking-[0.16em] text-white/40">
-                    {item.n}
-                  </span>
-                  <div>
-                    <p className="font-semibold text-white">{item.title}</p>
-                    <p className="mt-1">{item.body}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </FaqItem>
-          {FAQ.items.map((item, i) => (
-            <FaqItem key={item.q} question={item.q} index={i + 1}>
-              <p>{item.a}</p>
+
+        {/* "What happens next" and the FAQ share one accordion, so the section
+            ends in a few short lines instead of two more full-height blocks. */}
+        <div className="mt-[clamp(48px,9vh,104px)] grid grid-cols-1 gap-5 lg:grid-cols-[1fr_1.3fr] lg:gap-16">
+          <div>
+            <Eyebrow>{FAQ.eyebrow}</Eyebrow>
+            <h2 className="text-[clamp(1.5rem,3.4vw,2.5rem)] font-semibold leading-[1.08] tracking-tight text-white">
+              {FAQ.title}
+            </h2>
+          </div>
+          <div className="border-t border-white/10">
+            <FaqItem question={NEXT.question} index={0}>
+              <ol className="space-y-4">
+                {NEXT.items.map((item) => (
+                  <li key={item.n} className="grid grid-cols-[2rem_1fr] gap-x-2">
+                    <span className="pt-0.5 text-xs font-semibold tabular-nums tracking-[0.16em] text-white/40">
+                      {item.n}
+                    </span>
+                    <div>
+                      <p className="font-semibold text-white">{item.title}</p>
+                      <p className="mt-1">{item.body}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
             </FaqItem>
-          ))}
+            {FAQ.items.map((item, i) => (
+              <FaqItem key={item.q} question={item.q} index={i + 1}>
+                <p>{item.a}</p>
+              </FaqItem>
+            ))}
+          </div>
         </div>
       </div>
     </div>

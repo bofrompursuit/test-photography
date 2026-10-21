@@ -247,9 +247,69 @@ video {
 /* Same dark canvas and gutters as the other sections, with extra breathing
    room above so it reads as its own chapter after the showcase. */
 .section--starter {
-  padding-top: clamp(56px, 10vh, 128px);
-  padding-bottom: clamp(56px, 10vh, 128px);
+  /* Always clears the fixed header, so jumping here via the nav never hides
+     the headline under it. */
+  padding-top: calc(var(--header-h) + env(safe-area-inset-top) + clamp(16px, 4vh, 48px));
+  padding-bottom: clamp(24px, 4vh, 48px);
   border-top: 1px solid var(--border);
+}
+
+/* Ambient backdrop (src/starter/AmbientField.jsx). Covers the intro and the
+   top of the form, then fades out, so it never grows with long steps. */
+.section--starter {
+  /* clip, not hidden: a hidden box is still scrollable from script and by
+     in-page anchors, which slid the content up under the fixed header. */
+  overflow: hidden;
+  overflow: clip;
+  isolation: isolate;
+}
+
+.starter-ambient {
+  height: min(100%, 1150px);
+  -webkit-mask-image: radial-gradient(120% 85% at 50% 30%, #000 45%, transparent 100%);
+  mask-image: radial-gradient(120% 85% at 50% 30%, #000 45%, transparent 100%);
+}
+
+
+.starter-text-shield {
+  position: absolute;
+  inset: -40px -60px -40px -80px;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgba(10, 10, 12, 0.88), rgba(10, 10, 12, 0.6) 60%, transparent);
+  pointer-events: none;
+}
+
+/* The stream photograph on a slow drift along its flow. Transform only. */
+.starter-flow {
+  position: absolute;
+  inset: -8%;
+  background: url("/assets/images/starter-flow.webp") center / cover no-repeat;
+  opacity: 0.55;
+  animation: starter-flow-drift 28s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+
+/* Darkens toward the text side so the form stays the focus. */
+.starter-ambient::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(10, 10, 12, 0.82) 0%, rgba(10, 10, 12, 0.45) 55%, rgba(10, 10, 12, 0.15) 100%),
+    linear-gradient(180deg, transparent 60%, var(--bg) 100%);
+}
+
+@keyframes starter-flow-drift {
+  from { transform: translate3d(-3%, 1%, 0) scale(1.06); }
+  to { transform: translate3d(3%, -2%, 0) scale(1.14); }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .starter-flow {
+    animation: none;
+  }
 }
 
 /* ---------- Footer ambient music toggle ---------- */
