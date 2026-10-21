@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ContactCard, ContributeCard, ConnectCard } from "./cards";
-import AccordionGallery from "./AccordionGallery";
+import StackedCards from "./StackedCards";
 import CustomCursor from "./CustomCursor";
 import { STATUES } from "./marble";
 
@@ -184,13 +184,13 @@ export default function ConnectSection() {
         </p>
       </div>
 
-      {/* Accordion gallery */}
+      {/* Stacked card deck */}
       <div
         ref={cardsRef}
         style={{ opacity: 0, transform: "translateY(28px)" }}
         className="px-[clamp(20px,5vw,56px)] pt-[clamp(20px,3vh,36px)]"
       >
-        <AccordionGallery panels={PANELS} />
+        <StackedCards panels={PANELS} />
       </div>
 
       {/* Reveal footage, stitched straight onto the cards above. A square 1:1

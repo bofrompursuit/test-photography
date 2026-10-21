@@ -1,5 +1,5 @@
 /**
- * Museum backdrops for the accordion panels.
+ * Museum backdrops for the stacked contact cards.
  *
  * Photography is read from public/assets/statues/<id>.jpg. Those files ship with
  * the repo rather than coming from a stock-photo CDN, because a remote ID cannot
