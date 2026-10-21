@@ -4,12 +4,13 @@ import "./style.css";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { mountShowcase } from "./showcase/mount.jsx";
+import { mountStarterProject } from "./starter/mount.jsx";
 import { mountConnect } from "./connect/mount.jsx";
 
 gsap.registerPlugin(ScrollTrigger);
 
 // Seconds into intro.mp4 at which the name card lands — tune to match the cut.
-const HERO_REVEAL_AT_SECONDS = 8.3;
+const HERO_REVEAL_AT_SECONDS = 0.2;
 // If the video never starts (blocked autoplay, missing file, no codec support),
 // the hero copy still has to appear.
 const HERO_REVEAL_FALLBACK_MS = 3000;
@@ -115,6 +116,9 @@ if (!prefersReducedMotion && heroVideoWrap) {
 /* ---------- Mount the React islands ---------- */
 const showcaseRoot = document.getElementById("showcase-root");
 if (showcaseRoot) mountShowcase(showcaseRoot);
+
+const starterRoot = document.getElementById("starter-root");
+if (starterRoot) mountStarterProject(starterRoot);
 
 const connectRoot = document.getElementById("connect-root");
 if (connectRoot) mountConnect(connectRoot);

@@ -243,6 +243,15 @@ video {
   padding: 0;
 }
 
+/* ---------- Starter project (src/starter) ---------- */
+/* Same dark canvas and gutters as the other sections, with extra breathing
+   room above so it reads as its own chapter after the showcase. */
+.section--starter {
+  padding-top: clamp(72px, 12vh, 140px);
+  padding-bottom: clamp(72px, 12vh, 140px);
+  border-top: 1px solid var(--border);
+}
+
 /* ---------- Footer ambient music toggle ---------- */
 .music-toggle {
   display: inline-flex;
