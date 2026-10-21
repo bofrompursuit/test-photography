@@ -50,7 +50,7 @@ export function TextField({ field, fieldKey, value, error, onChange }) {
           type={field.type === "email" ? "email" : "text"}
           autoComplete={field.autoComplete}
           inputMode={field.type === "email" ? "email" : undefined}
-          className={`${inputClass} h-14`}
+          className={`${inputClass} h-12 sm:h-14`}
         />
       )}
       <FieldError id={errorId} message={error} />
@@ -95,6 +95,9 @@ export function ChoiceGroup({ field, fieldKey, value, error, onChange }) {
   const errorId = `${id}-error`;
   const multi = field.type === "multi";
   const selected = multi ? value ?? [] : value;
+  const options = field.options.map(normalize);
+  // Short answers (team size, years, revenue bands) fit two to a row even on a phone.
+  const compact = options.every((o) => o.label.length <= 14);
 
   const toggle = (optionValue, checked) => {
     if (!multi) return onChange(fieldKey, optionValue);
@@ -112,9 +115,9 @@ export function ChoiceGroup({ field, fieldKey, value, error, onChange }) {
       aria-describedby={error ? errorId : undefined}
       aria-required={field.required || undefined}
     >
-      <legend className="mb-3 p-0 text-[15px] font-semibold text-white">{field.label}</legend>
-      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-        {field.options.map(normalize).map((option, index) => {
+      <legend className="mb-2.5 p-0 text-[15px] font-semibold text-white sm:mb-3">{field.label}</legend>
+      <div className={`grid gap-2 sm:gap-2.5 ${compact ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2"}`}>
+        {options.map((option, index) => {
           const checked = multi ? selected.includes(option.value) : selected === option.value;
           return (
             <label
@@ -122,8 +125,9 @@ export function ChoiceGroup({ field, fieldKey, value, error, onChange }) {
               htmlFor={`${id}-${index}`}
               data-cursor-target
               className={
-                "group flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border bg-white/[0.03] px-4 py-3 " +
-                "text-[15px] leading-snug text-white/85 transition-colors duration-150 " +
+                "group flex min-h-12 cursor-pointer items-center rounded-xl border bg-white/[0.03] py-2.5 sm:min-h-14 sm:gap-3 sm:px-4 sm:py-3 " +
+                (compact ? "gap-2 px-3 " : "gap-3 px-3.5 ") +
+                "text-sm leading-snug text-white/85 sm:text-[15px] transition-colors duration-150 " +
                 "hover:border-white/35 hover:bg-white/[0.06] has-[:checked]:border-white has-[:checked]:bg-white has-[:checked]:text-black " +
                 "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-white " +
                 (error ? "border-[#FF8A80]/60" : "border-white/12")

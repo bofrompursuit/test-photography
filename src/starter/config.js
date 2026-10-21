@@ -17,13 +17,11 @@ export const SECTION = {
   eyebrow: "Starter project",
   title: { before: "Let's bring your project to ", accent: "life", after: "!" },
   intro:
-    "Tell us what you're making, whether that's a website, a brand identity, a shoot, a music video or a launch, and the questions fit it. Answer them below, reserve your call, and we'll scope it together.",
+    "A website, a brand, a shoot, a music video or a launch: answer a few questions that fit it, then book a call to scope it together.",
 };
 
 export const CARD = {
   title: "Tell us what you're making.",
-  subtitle:
-    "The questions fit your project. At the end, you book a call with the team that will make it with you.",
   back: "Back",
   continue: "Continue",
   submit: "Reserve Your Call",
@@ -333,8 +331,9 @@ export const PROJECT_DETAILS = {
   other: [{ id: "description", type: "textarea", label: "Tell us about it" }],
 };
 
+// Shown as the first FAQ item, so it collapses with the rest.
 export const NEXT = {
-  title: { before: "What happens ", accent: "next", after: "." },
+  question: "What happens next?",
   items: [
     {
       n: "01",

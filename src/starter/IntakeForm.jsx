@@ -194,7 +194,7 @@ export default function IntakeForm() {
   return (
     <div
       ref={cardRef}
-      className="scroll-mt-[calc(var(--header-h)+20px)] rounded-3xl border border-white/[0.08] bg-[var(--surface)] p-[clamp(20px,4.5vw,48px)]"
+      className="scroll-mt-[calc(var(--header-h)+20px)] rounded-3xl border border-white/[0.08] bg-[var(--surface)] p-[clamp(18px,4.5vw,48px)]"
     >
       <p className="sr-only" aria-live="polite" aria-atomic="true">
         {announcement}
@@ -241,18 +241,17 @@ export default function IntakeForm() {
           <h3
             ref={headingRef}
             tabIndex={-1}
-            className="mt-8 text-[clamp(1.5rem,3.2vw,2rem)] font-semibold leading-tight tracking-tight text-white outline-none"
+            className="mt-6 text-[clamp(1.35rem,3.2vw,2rem)] font-semibold leading-tight tracking-tight text-white outline-none sm:mt-8"
           >
             {CARD.title}
           </h3>
-          <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-white/55">{CARD.subtitle}</p>
 
-          <form noValidate onSubmit={handleSubmit} className="mt-8">
-            <div className="space-y-8">
+          <form noValidate onSubmit={handleSubmit} className="mt-6 sm:mt-8">
+            <div className="space-y-6 sm:space-y-8">
               {step.id === "about" ? (
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <div className="grid grid-cols-2 gap-x-3 gap-y-4 sm:gap-5">
                   {step.fields.map((field) => (
-                    <div key={field.id} className={field.type === "email" ? "sm:col-span-2" : ""}>
+                    <div key={field.id} className={field.type === "email" ? "col-span-2" : ""}>
                       <Field {...fieldProps(field.id, field)} />
                     </div>
                   ))}
@@ -262,7 +261,7 @@ export default function IntakeForm() {
                   <section
                     key={block.value}
                     aria-labelledby={domId(`block-${block.value}`)}
-                    className="space-y-7 border-t border-white/10 pt-7 first:border-t-0 first:pt-0"
+                    className="space-y-6 border-t border-white/10 pt-6 first:border-t-0 first:pt-0 sm:space-y-7 sm:pt-7"
                   >
                     <p id={domId(`block-${block.value}`)} className="text-sm text-white/50">
                       {DETAILS_INTRO(block.label)}
@@ -306,7 +305,7 @@ export default function IntakeForm() {
               )}
             </div>
 
-            <div className="mt-10 flex items-center justify-between gap-4">
+            <div className="mt-8 flex items-center justify-between gap-4 sm:mt-10">
               {stepIndex > 0 ? (
                 <button
                   type="button"

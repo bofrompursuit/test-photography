@@ -22,7 +22,7 @@ function AccentTitle({ title, className = "" }) {
   );
 }
 
-function FaqItem({ item, index }) {
+function FaqItem({ question, index, children }) {
   const [open, setOpen] = useState(false);
   const buttonId = `sp-faq-q-${index}`;
   const panelId = `sp-faq-a-${index}`;
@@ -36,9 +36,9 @@ function FaqItem({ item, index }) {
           aria-controls={panelId}
           onClick={() => setOpen((o) => !o)}
           data-cursor-target
-          className="flex w-full items-center justify-between gap-6 py-5 text-left text-[17px] font-semibold text-white transition-colors hover:text-white/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          className="flex w-full items-center justify-between gap-6 py-4 text-left text-base sm:py-5 sm:text-[17px] font-semibold text-white transition-colors hover:text-white/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         >
-          {item.q}
+          {question}
           {/* A plus that turns 45° into a cross when open. */}
           <span
             aria-hidden="true"
@@ -50,7 +50,7 @@ function FaqItem({ item, index }) {
         </button>
       </h3>
       <div id={panelId} role="region" aria-labelledby={buttonId} hidden={!open}>
-        <p className="pb-6 pr-10 text-[15px] leading-relaxed text-white/55">{item.a}</p>
+        <div className="pb-6 pr-2 text-[15px] leading-relaxed text-white/55 sm:pr-10">{children}</div>
       </div>
     </div>
   );
@@ -81,37 +81,42 @@ export default function StarterProjectSection() {
       <header className="max-w-4xl">
         <Eyebrow>{SECTION.eyebrow}</Eyebrow>
         <AccentTitle title={SECTION.title} />
-        <p className="mt-6 max-w-2xl text-[clamp(1rem,1.6vw,1.125rem)] leading-relaxed text-white/55">{SECTION.intro}</p>
+        <p className="mt-4 max-w-2xl text-[clamp(0.95rem,1.6vw,1.125rem)] leading-relaxed text-white/55 sm:mt-6">{SECTION.intro}</p>
       </header>
 
-      <div className="mt-[clamp(36px,6vh,64px)] max-w-[880px]">
+      <div className="mt-[clamp(24px,5vh,56px)] max-w-[880px]">
         <IntakeForm />
       </div>
 
-      <div className="mt-[clamp(72px,12vh,128px)]">
-        <AccentTitle title={NEXT.title} />
-        <ol className="mt-10 grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-8">
-          {NEXT.items.map((item) => (
-            <li key={item.n}>
-              <p className="eyebrow !mb-0">{item.n}</p>
-              <hr className="mt-4 border-0 border-t border-white/10" />
-              <h3 className="mt-5 text-lg font-semibold tracking-tight text-white">{item.title}</h3>
-              <p className="mt-2 text-[15px] leading-relaxed text-white/55">{item.body}</p>
-            </li>
-          ))}
-        </ol>
-      </div>
-
-      <div className="mt-[clamp(72px,12vh,128px)] grid grid-cols-1 gap-8 lg:grid-cols-[1fr_1.3fr] lg:gap-16">
+      {/* "What happens next" and the FAQ share one accordion, so the section
+          ends in a few short lines instead of two more full-height blocks. */}
+      <div className="mt-[clamp(48px,9vh,104px)] grid grid-cols-1 gap-5 lg:grid-cols-[1fr_1.3fr] lg:gap-16">
         <div>
           <Eyebrow>{FAQ.eyebrow}</Eyebrow>
-          <h2 className="text-[clamp(1.8rem,4vw,2.75rem)] font-semibold leading-[1.05] tracking-tight text-white">
+          <h2 className="text-[clamp(1.5rem,3.4vw,2.5rem)] font-semibold leading-[1.08] tracking-tight text-white">
             {FAQ.title}
           </h2>
         </div>
         <div className="border-t border-white/10">
+          <FaqItem question={NEXT.question} index={0}>
+            <ol className="space-y-4">
+              {NEXT.items.map((item) => (
+                <li key={item.n} className="grid grid-cols-[2rem_1fr] gap-x-2">
+                  <span className="pt-0.5 text-xs font-semibold tabular-nums tracking-[0.16em] text-white/40">
+                    {item.n}
+                  </span>
+                  <div>
+                    <p className="font-semibold text-white">{item.title}</p>
+                    <p className="mt-1">{item.body}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </FaqItem>
           {FAQ.items.map((item, i) => (
-            <FaqItem key={item.q} item={item} index={i} />
+            <FaqItem key={item.q} question={item.q} index={i + 1}>
+              <p>{item.a}</p>
+            </FaqItem>
           ))}
         </div>
       </div>

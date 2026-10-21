@@ -247,8 +247,8 @@ video {
 /* Same dark canvas and gutters as the other sections, with extra breathing
    room above so it reads as its own chapter after the showcase. */
 .section--starter {
-  padding-top: clamp(72px, 12vh, 140px);
-  padding-bottom: clamp(72px, 12vh, 140px);
+  padding-top: clamp(56px, 10vh, 128px);
+  padding-bottom: clamp(56px, 10vh, 128px);
   border-top: 1px solid var(--border);
 }
 
