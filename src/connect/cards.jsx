@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import QRCode from "qrcode";
+import { sendToInbox } from "../web3forms";
 
-// No form backend yet — submitting composes a mail draft in the visitor's client.
-export const CONTACT_EMAIL = "boudich@live.com.ph";
+// Shown if sending fails, so the visitor still has a way to reach Bo.
+export const CONTACT_EMAIL = "bo.moldenhauer@pursuit.org";
 
 export const VENMO_HANDLE = "Beau_Moldenhauer";
 export const VENMO_URL = `https://venmo.com/u/${VENMO_HANDLE}`;
@@ -50,31 +51,40 @@ function validate(values) {
 export function ContactCard({ idPrefix = "cf" }) {
   const [values, setValues] = useState({ name: "", contact: "", message: "" });
   const [errors, setErrors] = useState({});
-  const [status, setStatus] = useState("idle"); // idle | sent
+  const [status, setStatus] = useState("idle"); // idle | sending | sent | error
+  const botcheckRef = useRef(null);
 
   const set = (key) => (event) => {
     setValues((v) => ({ ...v, [key]: event.target.value }));
     if (errors[key]) setErrors((e) => ({ ...e, [key]: undefined }));
-    if (status === "sent") setStatus("idle");
+    if (status === "sent" || status === "error") setStatus("idle");
   };
 
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
+    if (status === "sending") return;
     const found = validate(values);
     setErrors(found);
     if (Object.keys(found).length) return;
 
-    const body = [
-      `Name: ${values.name}`,
-      `Contact: ${values.contact}`,
-      "",
-      values.message,
-    ].join("\n");
-
-    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-      `Portfolio inquiry from ${values.name}`
-    )}&body=${encodeURIComponent(body)}`;
-    setStatus("sent");
+    const name = values.name.trim();
+    const contact = values.contact.trim();
+    setStatus("sending");
+    try {
+      await sendToInbox({
+        subject: `Portfolio inquiry from ${name}`,
+        fromName: "Bo. portfolio · Contact",
+        // Only an email address can be replied to; a phone number stays in the body.
+        replyTo: contact.includes("@") ? contact : undefined,
+        botcheck: botcheckRef.current?.checked ?? false,
+        fields: { Name: name, "Email or contact details": contact, Message: values.message.trim() },
+      });
+      setStatus("sent");
+      setValues({ name: "", contact: "", message: "" });
+    } catch (error) {
+      console.error("Contact form failed to send:", error);
+      setStatus("error");
+    }
   };
 
   const fieldClass = (key) =>
@@ -131,18 +141,34 @@ export function ContactCard({ idPrefix = "cf" }) {
         />
       </Field>
 
+      {/* Honeypot: hidden from people, ticked by naive bots; Web3Forms drops those. */}
+      <input
+        ref={botcheckRef}
+        type="checkbox"
+        name="botcheck"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="hidden"
+      />
+
       <button
         type="submit"
         data-cursor-target
-        className="w-full rounded-lg border border-white/40 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:border-white/70 hover:bg-white/20 hover:shadow-[0_0_26px_-4px_rgba(255,255,255,0.55)] focus:outline-none focus:ring-2 focus:ring-white/70 active:scale-[0.99]"
+        disabled={status === "sending"}
+        aria-busy={status === "sending" || undefined}
+        className="w-full rounded-lg border border-white/40 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:border-white/70 hover:bg-white/20 hover:shadow-[0_0_26px_-4px_rgba(255,255,255,0.55)] focus:outline-none focus:ring-2 focus:ring-white/70 active:scale-[0.99] disabled:cursor-wait disabled:opacity-60"
       >
-        {status === "sent" ? "Draft opened ✓" : "Send inquiry"}
+        {status === "sending" ? "Sending…" : status === "sent" ? "Sent ✓" : "Send inquiry"}
       </button>
 
       <p role="status" aria-live="polite" className="min-h-[1.25rem] text-xs">
         {status === "sent" && (
-          <span className="text-white/70">
-            Your mail app should have opened with the message ready to send.
+          <span className="text-white/70">Thanks, your message is in. I'll get back to you soon.</span>
+        )}
+        {status === "error" && (
+          <span className="text-rose-300">
+            That didn't send. Please try again, or email {CONTACT_EMAIL}.
           </span>
         )}
       </p>

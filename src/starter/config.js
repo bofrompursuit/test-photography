@@ -8,10 +8,7 @@
 // While it's empty, the confirmation screen says we'll reach out by email instead.
 export const BOOKING_URL = "";
 
-// Web3Forms emails each submission to the address this key was created for.
-// The key is meant to live in public client code; it can only send to that inbox.
-export const WEB3FORMS_ACCESS_KEY = "25f5b66b-1733-41ff-821d-db2f7c83d9de";
-export const WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit";
+// Submissions are emailed through Web3Forms; see src/web3forms.js.
 
 export const SECTION = {
   eyebrow: "Starter project",

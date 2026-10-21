@@ -13,23 +13,13 @@
  */
 
 /**
- * Layer 1 — photography you control. Drop files into public/assets/statues and
- * they win over everything below; see the README there.
+ * Layer 1 — the photographs in public/assets/statues (see the README there).
+ * Wikimedia fallbacks used to sit under these, but browsers block that host's
+ * redirects as cross-origin images (ERR_BLOCKED_BY_ORB) and the local files
+ * always covered them anyway, so they only cost three failed requests.
  */
 const local = (id) => `url("/assets/statues/${id}.jpg"), `;
 
-/**
- * Layer 2 — Wikimedia Commons, addressed by filename rather than by an opaque
- * CDN id. Classical sculpture there is public domain (the works are millennia
- * old) and Special:FilePath resolves a name to the file, thumbnailed to width.
- *
- * These filenames are UNVERIFIED: this build environment can only reach GitHub,
- * so no image host can be checked from here. That is why each panel lists
- * several candidates — the browser draws the topmost layer that loads and skips
- * every one that 404s, so a wrong name costs a failed request and nothing else.
- */
-const commons = (file) =>
-  `url("https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(file)}?width=1400"), `;
 
 /**
  * Marble veining plus film grain. Two turbulence passes: a low-frequency one
@@ -82,20 +72,14 @@ export const STATUES = {
     // rather than one Florentine and two French.
     statue: "Artemis, Diana of Versailles",
     photoLayer:
-      local("contact") +
-      commons("Diane de Versailles Leochares.jpg") +
-      commons("Artemis with a doe, Diana of Versailles.jpg") +
-      commons("Diana of Versailles Louvre Ma589.jpg"),
+      local("contact"),
     marble: marbleBackdrop({ seed: 7, keyX: 30, keyY: 20 }),
   },
   contribute: {
     // Draped from the hips down; nothing to crop around.
     statue: "Venus de Milo",
     photoLayer:
-      local("contribute") +
-      commons("Venus de Milo Louvre Ma399 n4.jpg") +
-      commons("Venus de Milo Louvre Ma399.jpg") +
-      commons("Aphrodite of Milos.jpg"),
+      local("contribute"),
     marble: marbleBackdrop({ seed: 19, keyX: 66, keyY: 26 }),
   },
   connect: {
@@ -104,10 +88,7 @@ export const STATUES = {
     // the Venus, so the three panels read as one collection.
     statue: "Winged Victory of Samothrace",
     photoLayer:
-      local("connect") +
-      commons("Nike of Samothrake Louvre Ma2369 n4.jpg") +
-      commons("Winged Victory of Samothrace - Louvre.jpg") +
-      commons("Nike of Samothrace.jpg"),
+      local("connect"),
     marble: marbleBackdrop({ seed: 31, keyX: 44, keyY: 14 }),
   },
 };

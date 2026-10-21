@@ -8,6 +8,9 @@ import { mountStarterProject } from "./starter/mount.jsx";
 import { mountConnect } from "./connect/mount.jsx";
 
 gsap.registerPlugin(ScrollTrigger);
+// Phones resize the viewport whenever the address bar or keyboard slides in;
+// re-measuring every trigger for that makes the page lurch mid-scroll.
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 // Seconds into intro.mp4 at which the name card lands — tune to match the cut.
 const HERO_REVEAL_AT_SECONDS = 0.2;

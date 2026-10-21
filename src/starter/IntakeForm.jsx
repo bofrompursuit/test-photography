@@ -6,9 +6,8 @@ import {
   DETAILS_INTRO,
   PROJECT_DETAILS,
   STEPS,
-  WEB3FORMS_ACCESS_KEY,
-  WEB3FORMS_ENDPOINT,
 } from "./config";
+import { sendToInbox } from "../web3forms";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PROJECT_OPTIONS = STEPS.find((s) => s.id === "project").fields[0].options;
@@ -131,21 +130,13 @@ export default function IntakeForm() {
     const name = `${answers.firstName?.trim()} ${answers.lastName?.trim()}`;
     const projects = (answers.projectTypes ?? []).map(labelFor).join(", ");
     try {
-      const response = await fetch(WEB3FORMS_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          access_key: WEB3FORMS_ACCESS_KEY,
-          subject: `New starter project: ${name} (${projects})`,
-          from_name: "Bo. portfolio · Starter project",
-          // Replying to the notification email goes straight to the visitor.
-          replyto: answers.email.trim(),
-          botcheck: botcheckRef.current?.checked ?? false,
-          ...emailFields(answers),
-        }),
+      await sendToInbox({
+        subject: `New starter project: ${name} (${projects})`,
+        fromName: "Bo. portfolio · Starter project",
+        replyTo: answers.email.trim(),
+        botcheck: botcheckRef.current?.checked ?? false,
+        fields: emailFields(answers),
       });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok || !result.success) throw new Error(result.message || response.statusText);
       setStatus("sent");
     } catch (error) {
       console.error("Starter project submission failed:", error);

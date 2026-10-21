@@ -19,7 +19,13 @@ const GAP_BELOW_HEADER = 16; // px between the fixed site header and the pinned 
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 const pad = (n) => String(n + 1).padStart(2, "0");
 
-/** Stage geometry, re-measured on resize. `null` means "render the plain list". */
+/**
+ * Stage geometry. `null` means "render the plain list".
+ *
+ * Re-measured only when the width changes: on phones the soft keyboard and the
+ * collapsing address bar change the height constantly, and rebuilding the deck
+ * for those threw the visitor out of the form they were typing in.
+ */
 function useStage(count) {
   const reduce = useReducedMotion();
   const measure = () => {
@@ -32,10 +38,16 @@ function useStage(count) {
   const [stage, setStage] = useState(measure);
 
   useEffect(() => {
+    let width = window.innerWidth;
     const update = () => setStage(measure());
+    const onResize = () => {
+      if (window.innerWidth === width) return;
+      width = window.innerWidth;
+      update();
+    };
     update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, [reduce, count]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return stage;
@@ -148,6 +160,10 @@ export default function StackedCards({ panels }) {
   // A light spring between scroll and cards, so they settle rather than track.
   const progress = useSpring(raw, { stiffness: 260, damping: 34, mass: 0.6 });
   const [active, setActive] = useState(0);
+  // True while a field in the front card has focus. The deck holds still until
+  // the visitor leaves the form: no dealing, no snapping, whatever the page
+  // does as the keyboard opens or the browser scrolls the field into view.
+  const locked = useRef(false);
 
   useMotionValueEvent(raw, "change", (p) => setActive(clamp(Math.round(p), 0, count - 1)));
 
@@ -157,10 +173,13 @@ export default function StackedCards({ panels }) {
       trigger: wrapperRef.current,
       start: `top top+=${stage.top}`,
       end: `bottom top+=${stage.top + stage.height}`,
-      onUpdate: (self) => raw.set(self.progress * (count - 1)),
+      onUpdate: (self) => {
+        if (!locked.current) raw.set(self.progress * (count - 1));
+      },
       // Come to rest on a card, never halfway through a deal.
       snap: {
-        snapTo: 1 / (count - 1),
+        snapTo: (value) =>
+          locked.current ? value : Math.round(value * (count - 1)) / (count - 1),
         duration: { min: 0.2, max: 0.5 },
         delay: 0.12,
         ease: "power2.out",
@@ -173,6 +192,23 @@ export default function StackedCards({ panels }) {
       triggerRef.current = null;
     };
   }, [stage, count, raw]);
+
+  const isField = (el) => el?.matches?.("input, textarea, select, [contenteditable='true']");
+
+  const onFocusIn = (event) => {
+    if (isField(event.target)) locked.current = true;
+  };
+
+  const onFocusOut = (event) => {
+    if (isField(event.relatedTarget) && wrapperRef.current?.contains(event.relatedTarget)) return;
+    locked.current = false;
+    // Catch up with wherever the page scrolled to while the form had focus,
+    // then settle on the nearest whole card as the snap would have.
+    const trigger = triggerRef.current;
+    if (!trigger) return;
+    raw.set(trigger.progress * (count - 1));
+    if (trigger.isActive) jumpTo(Math.round(trigger.progress * (count - 1)));
+  };
 
   const jumpTo = (index) => {
     const trigger = triggerRef.current;
@@ -206,6 +242,8 @@ export default function StackedCards({ panels }) {
   return (
     <div
       ref={wrapperRef}
+      onFocus={onFocusIn}
+      onBlur={onFocusOut}
       style={{ height: stage.height + (count - 1) * stage.height * SCROLL_PER_CARD }}
     >
       <div className="sticky" style={{ top: stage.top, height: stage.height }}>
