@@ -1,6 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { Field, domId } from "./fields";
-import { BOOKING_URL, CARD, DETAILS_INTRO, PROJECT_DETAILS, STEPS } from "./config";
+import {
+  BOOKING_URL,
+  CARD,
+  DETAILS_INTRO,
+  PROJECT_DETAILS,
+  STEPS,
+  WEB3FORMS_ACCESS_KEY,
+  WEB3FORMS_ENDPOINT,
+} from "./config";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PROJECT_OPTIONS = STEPS.find((s) => s.id === "project").fields[0].options;
@@ -45,31 +53,29 @@ function validate(step, answers) {
   return errors;
 }
 
-// Collapses the flat answer map into one object, dropping detail blocks for
-// project types that were picked and then unpicked.
-function buildSubmission(answers) {
-  const pick = (step) =>
-    Object.fromEntries(
-      STEPS.find((s) => s.id === step).fields.map((f) => [f.id, answers[f.id] ?? ""])
-    );
-  const details = Object.fromEntries(
-    detailBlocks(answers).map((block) => [
-      block.value,
-      Object.fromEntries(
-        block.fields.map((f) => [
-          f.id,
-          answers[detailKey(block.value, f.id)] ?? (f.type === "multi" ? [] : ""),
-        ])
-      ),
-    ])
-  );
-  return {
-    about: pick("about"),
-    business: pick("business"),
-    project: { types: answers.projectTypes ?? [], details },
-    timeline: pick("timeline"),
-    submittedAt: new Date().toISOString(),
-  };
+const display = (value) =>
+  Array.isArray(value) ? value.join(", ") || "—" : String(value ?? "").trim() || "—";
+
+// Flattens the answers into labelled fields; Web3Forms prints each key/value
+// pair as one line of the email, in this order. Detail blocks for project
+// types that were picked and then unpicked are left out.
+function emailFields(answers) {
+  const fields = {};
+  for (const step of STEPS) {
+    if (step.dynamic) {
+      for (const block of detailBlocks(answers)) {
+        for (const f of block.fields) {
+          fields[`${block.label} · ${f.label}`] = display(answers[detailKey(block.value, f.id)]);
+        }
+      }
+      continue;
+    }
+    for (const f of step.fields) {
+      const value = answers[f.id];
+      fields[f.label] = f.id === "projectTypes" ? display((value ?? []).map(labelFor)) : display(value);
+    }
+  }
+  return fields;
 }
 
 export default function IntakeForm() {
@@ -77,6 +83,10 @@ export default function IntakeForm() {
   const [answers, setAnswers] = useState({});
   const [errors, setErrors] = useState({});
   const [announcement, setAnnouncement] = useState("");
+  // idle | sending | sent | error
+  const [status, setStatus] = useState("idle");
+  const botcheckRef = useRef(null);
+  const successRef = useRef(null);
   const cardRef = useRef(null);
   const headingRef = useRef(null);
   const firstRender = useRef(true);
@@ -115,20 +125,40 @@ export default function IntakeForm() {
     target?.focus();
   };
 
-  const reserveCall = () => {
-    const submission = buildSubmission(answers);
-    console.log("Starter project submission:", submission);
-
-    // TODO: send `submission` to a form backend or email service here
-    // (e.g. fetch("/api/starter-project", { method: "POST", body: JSON.stringify(submission) })
-    // or Formspree / Resend / a CRM webhook) before handing off to booking.
-
-    if (BOOKING_URL) {
-      window.open(BOOKING_URL, "_blank", "noopener,noreferrer");
-    } else {
-      console.warn("BOOKING_URL is empty: set it in src/starter/config.js.");
+  const reserveCall = async () => {
+    setStatus("sending");
+    setAnnouncement(CARD.sending);
+    const name = `${answers.firstName?.trim()} ${answers.lastName?.trim()}`;
+    const projects = (answers.projectTypes ?? []).map(labelFor).join(", ");
+    try {
+      const response = await fetch(WEB3FORMS_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          subject: `New starter project: ${name} (${projects})`,
+          from_name: "Bo. portfolio · Starter project",
+          // Replying to the notification email goes straight to the visitor.
+          replyto: answers.email.trim(),
+          botcheck: botcheckRef.current?.checked ?? false,
+          ...emailFields(answers),
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) throw new Error(result.message || response.statusText);
+      setStatus("sent");
+    } catch (error) {
+      console.error("Starter project submission failed:", error);
+      setStatus("error");
+      setAnnouncement(CARD.error);
     }
   };
+
+  useEffect(() => {
+    if (status !== "sent") return;
+    successRef.current?.focus({ preventScroll: true });
+    setAnnouncement(CARD.successTitle(answers.firstName.trim()));
+  }, [status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -142,7 +172,9 @@ export default function IntakeForm() {
       focusFirstError(errs);
       return;
     }
-    if (isLast) reserveCall();
+    if (isLast) {
+      if (status !== "sending") reserveCall();
+    }
     else setStepIndex((i) => i + 1);
   };
 
@@ -180,80 +212,126 @@ export default function IntakeForm() {
         ))}
       </div>
 
-      <h3
-        ref={headingRef}
-        tabIndex={-1}
-        className="mt-8 text-[clamp(1.5rem,3.2vw,2rem)] font-semibold leading-tight tracking-tight text-white outline-none"
-      >
-        {CARD.title}
-      </h3>
-      <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-white/55">{CARD.subtitle}</p>
-
-      <form noValidate onSubmit={handleSubmit} className="mt-8">
-        <div className="space-y-8">
-          {step.id === "about" ? (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              {step.fields.map((field) => (
-                <div key={field.id} className={field.type === "email" ? "sm:col-span-2" : ""}>
-                  <Field {...fieldProps(field.id, field)} />
-                </div>
-              ))}
-            </div>
-          ) : step.dynamic ? (
-            detailBlocks(answers).map((block) => (
-              <section
-                key={block.value}
-                aria-labelledby={domId(`block-${block.value}`)}
-                className="space-y-7 border-t border-white/10 pt-7 first:border-t-0 first:pt-0"
-              >
-                <p id={domId(`block-${block.value}`)} className="text-sm text-white/50">
-                  {DETAILS_INTRO(block.label)}
-                </p>
-                {block.fields.map((field) => {
-                  const key = detailKey(block.value, field.id);
-                  return <Field key={key} {...fieldProps(key, field)} />;
-                })}
-              </section>
-            ))
-          ) : (
-            step.fields.map((field) => (
-              <Field key={field.id} {...fieldProps(field.id, field)} />
-            ))
-          )}
-
-          {step.callout && (
-            <div>
-              <div className="rounded-xl border border-white/15 bg-white/[0.04] px-5 py-4 text-[15px] leading-relaxed text-white/70">
-                <strong className="font-semibold text-white">{step.callout.strong}</strong>{" "}
-                {step.callout.body}
-              </div>
-              <p className="mt-4 text-sm text-white/50">{step.note}</p>
-            </div>
-          )}
-        </div>
-
-        <div className="mt-10 flex items-center justify-between gap-4">
-          {stepIndex > 0 ? (
-            <button
-              type="button"
-              onClick={goBack}
-              data-cursor-target
-              className="rounded-md px-1 py-2 text-[15px] font-medium text-white/60 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-            >
-              {CARD.back}
-            </button>
-          ) : (
-            <span />
-          )}
-          <button
-            type="submit"
-            data-cursor-target
-            className="rounded-full bg-white px-8 py-4 text-[15px] font-semibold text-black transition-colors hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+      {status === "sent" ? (
+        <div className="mt-8">
+          <h3
+            ref={successRef}
+            tabIndex={-1}
+            className="text-[clamp(1.5rem,3.2vw,2rem)] font-semibold leading-tight tracking-tight text-white outline-none"
           >
-            {isLast ? CARD.submit : CARD.continue}
-          </button>
+            {CARD.successTitle(answers.firstName.trim())}
+          </h3>
+          <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-white/55">
+            {BOOKING_URL ? CARD.successWithBooking : CARD.successNoBooking}
+          </p>
+          {BOOKING_URL && (
+            <a
+              href={BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-cursor-target
+              className="mt-8 inline-flex rounded-full bg-white px-8 py-4 text-[15px] font-semibold text-black no-underline transition-colors hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            >
+              {CARD.bookCta}
+            </a>
+          )}
         </div>
-      </form>
+      ) : (
+        <>
+          <h3
+            ref={headingRef}
+            tabIndex={-1}
+            className="mt-8 text-[clamp(1.5rem,3.2vw,2rem)] font-semibold leading-tight tracking-tight text-white outline-none"
+          >
+            {CARD.title}
+          </h3>
+          <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-white/55">{CARD.subtitle}</p>
+
+          <form noValidate onSubmit={handleSubmit} className="mt-8">
+            <div className="space-y-8">
+              {step.id === "about" ? (
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                  {step.fields.map((field) => (
+                    <div key={field.id} className={field.type === "email" ? "sm:col-span-2" : ""}>
+                      <Field {...fieldProps(field.id, field)} />
+                    </div>
+                  ))}
+                </div>
+              ) : step.dynamic ? (
+                detailBlocks(answers).map((block) => (
+                  <section
+                    key={block.value}
+                    aria-labelledby={domId(`block-${block.value}`)}
+                    className="space-y-7 border-t border-white/10 pt-7 first:border-t-0 first:pt-0"
+                  >
+                    <p id={domId(`block-${block.value}`)} className="text-sm text-white/50">
+                      {DETAILS_INTRO(block.label)}
+                    </p>
+                    {block.fields.map((field) => {
+                      const key = detailKey(block.value, field.id);
+                      return <Field key={key} {...fieldProps(key, field)} />;
+                    })}
+                  </section>
+                ))
+              ) : (
+                step.fields.map((field) => (
+                  <Field key={field.id} {...fieldProps(field.id, field)} />
+                ))
+              )}
+
+              {step.callout && (
+                <div>
+                  <div className="rounded-xl border border-white/15 bg-white/[0.04] px-5 py-4 text-[15px] leading-relaxed text-white/70">
+                    <strong className="font-semibold text-white">{step.callout.strong}</strong>{" "}
+                    {step.callout.body}
+                  </div>
+                  <p className="mt-4 text-sm text-white/50">{step.note}</p>
+                  {/* Honeypot: hidden from people, ticked by naive bots; Web3Forms drops those. */}
+                  <input
+                    ref={botcheckRef}
+                    type="checkbox"
+                    name="botcheck"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
+                    className="hidden"
+                  />
+                </div>
+              )}
+
+              {isLast && status === "error" && (
+                <p role="alert" className="text-sm font-medium text-[#FF8A80]">
+                  {CARD.error}
+                </p>
+              )}
+            </div>
+
+            <div className="mt-10 flex items-center justify-between gap-4">
+              {stepIndex > 0 ? (
+                <button
+                  type="button"
+                  onClick={goBack}
+                  data-cursor-target
+                  className="rounded-md px-1 py-2 text-[15px] font-medium text-white/60 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                >
+                  {CARD.back}
+                </button>
+              ) : (
+                <span />
+              )}
+              <button
+                type="submit"
+                data-cursor-target
+                disabled={status === "sending"}
+                aria-busy={status === "sending" || undefined}
+                className="rounded-full bg-white px-8 py-4 text-[15px] font-semibold text-black transition-colors hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-wait disabled:opacity-60"
+              >
+                {!isLast ? CARD.continue : status === "sending" ? CARD.sending : CARD.submit}
+              </button>
+            </div>
+          </form>
+        </>
+      )}
     </div>
   );
 }

@@ -5,7 +5,13 @@
 // Every field starts empty; `placeholder` is the only pre-filled hint.
 
 // TODO: paste the booking page link (Calendly, Cal.com, SavvyCal, ...) here.
+// While it's empty, the confirmation screen says we'll reach out by email instead.
 export const BOOKING_URL = "";
+
+// Web3Forms emails each submission to the address this key was created for.
+// The key is meant to live in public client code; it can only send to that inbox.
+export const WEB3FORMS_ACCESS_KEY = "25f5b66b-1733-41ff-821d-db2f7c83d9de";
+export const WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit";
 
 export const SECTION = {
   eyebrow: "Starter project",
@@ -21,6 +27,12 @@ export const CARD = {
   back: "Back",
   continue: "Continue",
   submit: "Reserve Your Call",
+  sending: "Sending…",
+  error: "Something went wrong sending your answers. Please try again, or email bo.moldenhauer@pursuit.org.",
+  successTitle: (name) => `Thanks, ${name}. Your answers are in.`,
+  successWithBooking: "Last step: pick a time that works for you.",
+  successNoBooking: "We'll read through them and email you within a day to set up your call.",
+  bookCta: "Pick your call time",
 };
 
 const REVENUE = [
