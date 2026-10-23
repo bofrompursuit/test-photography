@@ -4,6 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ContactCard, ContributeCard, ConnectCard } from "./cards";
 import StackedCards from "./StackedCards";
 import CustomCursor from "./CustomCursor";
+import Partners from "./Partners";
 import { STATUES } from "./marble";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -192,6 +193,8 @@ export default function ConnectSection() {
       >
         <StackedCards panels={PANELS} />
       </div>
+
+      <Partners />
 
       {/* Reveal footage, stitched straight onto the cards above. A square 1:1
           crop on desktop that fills the available width, full-bleed like the

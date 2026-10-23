@@ -111,7 +111,7 @@ if (!prefersReducedMotion && heroVideoWrap) {
       scrub: true,
     },
   })
-    .to(heroVideoWrap, { scale: 1.12, filter: "brightness(0.55)", ease: "none" }, 0)
+    .to(heroVideoWrap, { scale: 1.12, ease: "none" }, 0)
     .to("[data-hero] .hero-content", { y: -80, opacity: 0, ease: "none" }, 0)
     .to("[data-hero] .scroll-cue", { opacity: 0, ease: "none" }, 0);
 }
