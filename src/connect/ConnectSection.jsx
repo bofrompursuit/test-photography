@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ContactCard, ContributeCard, ConnectCard, ContentNeedsCard, FORTH_THEME } from "./cards";
+import { ContactCard, ContributeCard, ConnectCard, ContentNeedsCard, FORTH_THEME, VENMO_THEME } from "./cards";
 import StackedCards from "./StackedCards";
 import CustomCursor from "./CustomCursor";
 import Partners from "./Partners";
@@ -34,7 +34,7 @@ const PANELS = [
     id: "contribute",
     label: "Contribute",
     blurb: "Back the work.",
-    statue: STATUES.contribute,
+    theme: VENMO_THEME,
     Card: ContributeCard,
   },
   {

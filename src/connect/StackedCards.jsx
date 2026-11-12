@@ -104,7 +104,7 @@ function CardHeader({ index, panel }) {
       className={`relative flex shrink-0 items-center justify-between gap-3 border-b px-5 ${
         theme ? "border-black/15" : "border-white/10 bg-black/35 backdrop-blur-sm"
       }`}
-      style={{ height: PEEK, color: theme?.foreground }}
+      style={{ height: PEEK, color: theme?.foreground, borderColor: theme?.divider }}
     >
       <h3
         className={`flex items-baseline gap-3 text-sm font-semibold uppercase tracking-[0.28em] ${theme ? "" : "text-white"}`}

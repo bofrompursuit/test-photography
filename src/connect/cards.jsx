@@ -195,6 +195,17 @@ function Field({ id, label, error, children }) {
   );
 }
 
+// Venmo's own palette, matched from venmo.com/u/Beau_Moldenhauer: its button
+// blue on white. Venmo's typeface (Scto Grotesk) isn't public, so a clean
+// system grotesk stands in.
+export const VENMO_BLUE = "#0074DE";
+export const VENMO_THEME = {
+  background: VENMO_BLUE,
+  foreground: "#ffffff",
+  divider: "rgba(255,255,255,0.22)",
+  font: '"Helvetica Neue", Helvetica, Arial, system-ui, sans-serif',
+};
+
 export function ContributeCard() {
   const [qr, setQr] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -204,7 +215,7 @@ export function ContributeCard() {
     QRCode.toDataURL(VENMO_URL, {
       margin: 1,
       width: 400,
-      color: { dark: "#ffffff", light: "#00000000" },
+      color: { dark: VENMO_BLUE, light: "#ffffff" },
     })
       .then(setQr)
       .catch(() => setQr(null));
@@ -228,15 +239,18 @@ export function ContributeCard() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-5 text-center">
-      <p className="text-sm leading-relaxed text-white/70">
+    <div
+      className="flex h-full flex-col items-center gap-5 text-center text-white"
+      style={{ fontFamily: VENMO_THEME.font }}
+    >
+      <p className="text-sm font-medium leading-relaxed text-white/90">
         Donate to my SMB &amp; my future apps through Venmo
       </p>
 
       <motion.div
         whileHover={{ scale: 1.04 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="rounded-xl border border-white/30 bg-black/70 p-3 shadow-[0_0_32px_-8px_rgba(255,255,255,0.5)]"
+        className="rounded-2xl bg-white p-3 shadow-[0_12px_32px_-12px_rgba(0,0,0,0.45)]"
       >
         {qr ? (
           <img
@@ -245,7 +259,10 @@ export function ContributeCard() {
             className="h-36 w-36"
           />
         ) : (
-          <div className="flex h-36 w-36 items-center justify-center px-2 text-xs text-white/50">
+          <div
+            className="flex h-36 w-36 items-center justify-center px-2 text-xs"
+            style={{ color: VENMO_BLUE }}
+          >
             QR unavailable — use the handle below
           </div>
         )}
@@ -258,15 +275,16 @@ export function ContributeCard() {
         whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.98 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-white/30 px-5 py-3 text-sm font-semibold tracking-wide text-white transition-colors hover:border-white/70 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+        style={{ color: VENMO_BLUE }}
+        className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold tracking-wide transition-colors hover:bg-white/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0074DE]"
       >
         <span>@{VENMO_HANDLE}</span>
-        <span aria-hidden="true" className="text-white/60">
+        <span aria-hidden="true" className="opacity-70">
           {copied ? "✓" : "⧉"}
         </span>
       </motion.button>
 
-      <p role="status" aria-live="polite" className="min-h-[1.1rem] text-xs text-white/70">
+      <p role="status" aria-live="polite" className="min-h-[1.1rem] text-xs text-white/85">
         {copied ? "Handle copied to your clipboard." : ""}
       </p>
 
@@ -275,7 +293,7 @@ export function ContributeCard() {
         target="_blank"
         rel="noopener noreferrer"
         data-cursor-target
-        className="inline-flex min-h-[44px] items-center px-3 text-xs uppercase tracking-[0.18em] text-white/60 underline-offset-4 transition hover:text-white hover:underline"
+        className="mt-auto inline-flex min-h-[44px] items-center px-3 text-xs font-semibold uppercase tracking-[0.18em] text-white/85 underline-offset-4 transition hover:text-white hover:underline"
       >
         Open Venmo ↗
       </a>
