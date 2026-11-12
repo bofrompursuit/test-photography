@@ -40,7 +40,7 @@ function useThumbHeight(ref, count) {
  * background, with its details, a thumbnail strip, a visit link and arrows.
  * Replaces the old card marquee + fullscreen overlay, so nothing opens on top.
  */
-export default function InlineShowcase({ category, tabs = null }) {
+export default function InlineShowcase({ category, tabs = null, lead = null }) {
   const items = category.items;
   const [index, setIndex] = useState(0);
   const sectionRef = useRef(null);
@@ -112,6 +112,8 @@ export default function InlineShowcase({ category, tabs = null }) {
 
       {/* Category header + active project details */}
       <div className="w-full">
+        {/* Optional link shown top-centre, above the tab row. */}
+        {lead && <div className="mb-5 flex justify-center sm:mb-6">{lead}</div>}
         {/* With tabs, the tab row names the group; without, a plain heading does. */}
         {tabs ?? (
           <h3 className="text-[0.7rem] uppercase tracking-[0.2em] text-white/60">

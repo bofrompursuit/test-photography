@@ -14,7 +14,7 @@ const SHORT_LABELS = {
  * below shows that group's projects in place. Switching tabs starts the group
  * at its first project.
  */
-export default function WorkShowcase({ categories }) {
+export default function WorkShowcase({ categories, lead = null }) {
   const [activeId, setActiveId] = useState(categories[0].id);
   const tabRefs = useRef([]);
   const active = categories.find((c) => c.id === activeId) ?? categories[0];
@@ -72,7 +72,7 @@ export default function WorkShowcase({ categories }) {
     <div id="work-panel" role="tabpanel" aria-labelledby={`work-tab-${active.id}`}>
       {/* Not keyed by group: the panel stays mounted so the tab pill can slide
           and keyboard focus stays on the tab; it resets its own project index. */}
-      <InlineShowcase category={active} tabs={tabs} />
+      <InlineShowcase category={active} tabs={tabs} lead={lead} />
     </div>
   );
 }

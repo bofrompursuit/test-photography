@@ -30,6 +30,19 @@ const BASEQ_FEATURES = [
   },
 ];
 
+const LOOKBOOK_LINK = (
+  <a
+    href="https://lookbook.pursuit.org/people/bo-moldenhauer"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-flex items-center gap-2 rounded-full bg-black/30 py-1.5 pl-3 pr-3.5 text-sm font-medium text-white/85 ring-1 ring-white/25 ring-inset backdrop-blur-md transition-colors hover:bg-white/10 hover:text-white"
+  >
+    <PursuitMark className="h-4 w-auto" />
+    Pursuit Lookbook
+    <span aria-hidden="true">↗</span>
+  </a>
+);
+
 export default function FeaturedShowcase() {
   return (
     <>
@@ -41,22 +54,12 @@ export default function FeaturedShowcase() {
           Building automated workflows and smart AI tools that optimize finance
           workflows, eliminate operational bottlenecks, and help teams grow together.
         </p>
-        <a
-          href="https://lookbook.pursuit.org/people/bo-moldenhauer"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-4 inline-flex items-center gap-2 rounded-full py-1.5 pl-3 pr-3.5 text-sm font-medium text-white/80 ring-1 ring-white/20 ring-inset transition-colors hover:bg-white/10 hover:text-white"
-        >
-          <PursuitMark className="h-4 w-auto" />
-          Pursuit Lookbook
-          <span aria-hidden="true">↗</span>
-        </a>
       </div>
 
       <div className="pb-[clamp(24px,4vh,48px)]">
         {/* All three subsections in one panel, switched by tabs; nothing opens on top. */}
         <div className="mt-[clamp(24px,4vh,48px)]">
-          <WorkShowcase categories={categories} />
+          <WorkShowcase categories={categories} lead={LOOKBOOK_LINK} />
         </div>
 
         {/* BASE Q: embedded Google Drive file, placed after Bo in Colla"BO"ration. */}
