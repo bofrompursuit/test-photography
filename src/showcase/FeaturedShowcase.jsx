@@ -7,6 +7,20 @@ import FullscreenShowcase from "./FullscreenShowcase";
 const BASEQ_FILE_ID = "1ebXqxCnAy3TL2BxvpFlVpVemqY1XsO9t";
 const BASEQ_VIEW_URL = `https://drive.google.com/file/d/${BASEQ_FILE_ID}/view?usp=sharing`;
 const BASEQ_EMBED_URL = `https://drive.google.com/file/d/${BASEQ_FILE_ID}/preview`;
+const BASEQ_FEATURES = [
+  {
+    title: "AI-Powered Mentor Matching",
+    text: "Instantly generates ranked, explained shortlists of mentors for founders or sessions.",
+  },
+  {
+    title: "Automated Mentor Updates",
+    text: "Keeps the 750+ mentor database accurate through automated Google Sheet syncing without manual copy-pasting.",
+  },
+  {
+    title: "Secure Startup Intro Requests",
+    text: "Allows founders to browse the mentor directory and request introductions directly.",
+  },
+];
 
 export default function FeaturedShowcase() {
   const [open, setOpen] = useState(null);
@@ -56,6 +70,20 @@ export default function FeaturedShowcase() {
             >
               Open in Google Drive ↗
             </a>
+            <p className="mt-4 max-w-3xl text-white/70">
+              BaseQ replaces manual spreadsheet shuffling and scattered tools with a
+              single, secure platform. It powers:
+            </p>
+            <ul className="mt-3 max-w-3xl space-y-2 text-sm leading-relaxed text-white/60 sm:text-base">
+              {BASEQ_FEATURES.map((f) => (
+                <li key={f.title} className="flex gap-2.5">
+                  <span aria-hidden="true" className="mt-[0.6em] h-1 w-1 shrink-0 rounded-full bg-white/50" />
+                  <span>
+                    <span className="font-medium text-white/90">{f.title}:</span> {f.text}
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
           <div className="mt-4 px-[clamp(20px,5vw,56px)] sm:mt-5">
             <div className="relative aspect-video w-full max-w-5xl overflow-hidden rounded-2xl bg-black ring-1 ring-white/10 ring-inset">
