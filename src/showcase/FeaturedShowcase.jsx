@@ -63,13 +63,16 @@ export default function FeaturedShowcase() {
         <div className="py-6 sm:py-8">
           <div className="px-[clamp(20px,5vw,56px)]">
             <h3 className="text-xl font-semibold tracking-tight text-white sm:text-2xl">
-              BASE Q
+              PROJECT BASE Q
             </h3>
+            <p className="mt-2 max-w-3xl text-base font-medium text-white/85">
+              This is made to scale. ASK and we can make you solutions.
+            </p>
             <a
               href={BASEQ_VIEW_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-1 inline-block text-sm text-white/50 transition-colors hover:text-white"
+              className="mt-2 inline-block text-sm text-white/50 transition-colors hover:text-white"
             >
               Open in Google Drive ↗
             </a>
