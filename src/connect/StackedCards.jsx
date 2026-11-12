@@ -2,13 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 
 /**
- * Apple Wallet-style stack. At rest the passes overlap so only each header
- * shows and the last pass is fully visible. Tapping a pass brings it to the
+ * Apple Wallet-style stack. At rest the passes overlap so only each title
+ * band shows, like Wallet's stack. Tapping a pass brings it to the
  * top, fully open, and tucks the others beneath it, headers showing; tapping
  * its header again puts it back. No scroll pinning: the stack sits in the page.
  */
 
-const PEEK = 60; // px of header each stacked pass shows
+const PEEK = 68; // px of title band each stacked pass shows (and the header height)
+const REST_TAIL = 14; // px of the last pass shown below its band when nothing is open
 const TUCK_GAP = 16; // px between the open pass and the tucked stack
 
 // Wallet pass proportions: one phone-width column, taller than wide.
@@ -111,7 +112,7 @@ export default function StackedCards({ panels }) {
   const reduce = useReducedMotion();
 
   // Where each pass sits, and which one can be used.
-  const front = open ?? count - 1;
+  const front = open; // at rest nothing is open: every pass is just a title band to tap
   const layout = panels.map((_, i) => {
     if (open === null) return i * PEEK;
     if (i === open) return 0;
@@ -120,7 +121,7 @@ export default function StackedCards({ panels }) {
   });
   const height =
     open === null
-      ? (count - 1) * PEEK + cardHeight
+      ? count * PEEK + REST_TAIL
       : cardHeight + TUCK_GAP + (count - 1) * PEEK;
 
   const choose = (i) => {
@@ -190,7 +191,8 @@ export default function StackedCards({ panels }) {
                 type="button"
                 tabIndex={-1}
                 onClick={() => choose(index)}
-                className="absolute inset-0 top-[60px] cursor-pointer"
+                className="absolute inset-0 cursor-pointer"
+                style={{ top: PEEK }}
               >
                 <span className="sr-only">Open {panel.label}</span>
               </button>
