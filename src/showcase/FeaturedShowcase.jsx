@@ -62,24 +62,34 @@ export default function FeaturedShowcase() {
           <WorkShowcase categories={categories} lead={LOOKBOOK_LINK} />
         </div>
 
-        {/* BASE Q: embedded Google Drive file, placed after Bo in Colla"BO"ration. */}
+        {/* Case study: BaseQ, placed after Bo in Colla"BO"ration. */}
         {/* Phones: text then video, stacked. Desktop: text left, video right. */}
         <div className="px-[clamp(20px,5vw,56px)] py-6 sm:py-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-center lg:gap-12">
           <div>
             <h3 className="text-xl font-semibold tracking-tight text-white sm:text-2xl">
-              PROJECT BASE Q
+              Case Study: Project BaseQ
             </h3>
             <p className="mt-2 max-w-3xl text-base font-medium text-white/85">
-              This is made to scale. ASK and we can make you solutions.
+              Built to scale from day one. Need a platform like this for your team?
             </p>
-            <a
-              href={BASEQ_VIEW_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-2 inline-block text-sm text-white/50 transition-colors hover:text-white"
-            >
-              Open in Google Drive ↗
-            </a>
+            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3">
+              {/* Same-page anchor, as in the site nav, so the form is one tap away. */}
+              <a
+                href="#starter-project"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-medium text-black transition hover:bg-white/85"
+              >
+                Start a project
+                <span aria-hidden="true">→</span>
+              </a>
+              <a
+                href={BASEQ_VIEW_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-white/50 transition-colors hover:text-white"
+              >
+                Open in Google Drive ↗
+              </a>
+            </div>
             <p className="mt-4 max-w-3xl text-white/70">
               BaseQ replaces manual spreadsheet shuffling and scattered tools with a
               single, secure platform. It powers:
