@@ -1,36 +1,41 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Bo.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
   <defs>
-    <!-- brushed silver plate: bright top-left falling to a deeper edge bottom-right -->
-    <linearGradient id="plate" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ffffff" />
-      <stop offset="42%" stop-color="#eceef2" />
-      <stop offset="72%" stop-color="#d5d9e0" />
-      <stop offset="100%" stop-color="#b9bfc9" />
+    <radialGradient id="bg" cx="50%" cy="38%" r="75%">
+      <stop offset="0" stop-color="#1a2240"/>
+      <stop offset="0.55" stop-color="#0c1022"/>
+      <stop offset="1" stop-color="#05060b"/>
+    </radialGradient>
+    <linearGradient id="chrome" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.32" stop-color="#e6e9f0"/>
+      <stop offset="0.5" stop-color="#9aa3b5"/>
+      <stop offset="0.56" stop-color="#7c8598"/>
+      <stop offset="0.7" stop-color="#e9ecf2"/>
+      <stop offset="1" stop-color="#b3bac8"/>
     </linearGradient>
-
-    <!-- soft sheen so the plate reads as metal rather than flat paper -->
-    <radialGradient id="sheen" cx="0.3" cy="0.22" r="0.75">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95" />
-      <stop offset="55%" stop-color="#ffffff" stop-opacity="0.18" />
-      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
-    </radialGradient>
-
-    <!-- inner edge darkening, keeps the square from looking pasted on -->
-    <radialGradient id="vignette" cx="0.5" cy="0.5" r="0.72">
-      <stop offset="70%" stop-color="#000000" stop-opacity="0" />
-      <stop offset="100%" stop-color="#39404a" stop-opacity="0.18" />
-    </radialGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.75"/>
+      <stop offset="0.45" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="emboss" x="-20%" y="-20%" width="140%" height="140%">
+      <!-- Bevel: light from the upper left on a softened copy of the letterforms -->
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6" result="soft"/>
+      <feSpecularLighting in="soft" surfaceScale="7" specularConstant="1.1" specularExponent="22" lighting-color="#ffffff" result="spec">
+        <feDistantLight azimuth="235" elevation="48"/>
+      </feSpecularLighting>
+      <feComposite in="spec" in2="SourceAlpha" operator="in" result="specIn"/>
+      <feComposite in="SourceGraphic" in2="specIn" operator="arithmetic" k1="0" k2="1" k3="0.85" k4="0" result="lit"/>
+      <!-- Pressed-in edge below, lifted glow above -->
+      <feOffset in="SourceAlpha" dx="0" dy="14" result="dropOff"/>
+      <feGaussianBlur in="dropOff" stdDeviation="14" result="dropBlur"/>
+      <feFlood flood-color="#000" flood-opacity="0.75"/>
+      <feComposite in2="dropBlur" operator="in" result="drop"/>
+      <feMerge><feMergeNode in="drop"/><feMergeNode in="lit"/></feMerge>
+    </filter>
+    <clipPath id="textClip"><g transform="translate(187.7 664.7) scale(0.21929 -0.21929)"><path transform="translate(0.0 0)" d="M111 0H742C1081 0 1264 171 1264 420C1264 632 1124 760 942 777V779C1106 820 1209 935 1209 1107C1209 1336 1029 1490 708 1490H111ZM412 242V639H704C859 639 950 561 950 437C950 313 857 242 699 242ZM412 871V1248H685C820 1248 903 1175 903 1059C903 944 820 871 685 871Z"/> <path transform="translate(1279.0 0)" d="M594 -24C915 -24 1131 196 1131 527C1131 858 915 1080 594 1080C274 1080 58 858 58 527C58 196 274 -24 594 -24ZM594 215C451 215 355 331 355 527C355 724 452 841 594 841C737 841 834 724 834 527C834 331 738 215 594 215Z"/> <path transform="translate(2427.1 0)" d="M250 -18C345 -18 420 57 420 152C420 246 345 322 250 322C156 322 81 246 81 152C81 57 156 -18 250 -18Z"/></g></clipPath>
   </defs>
-
-  <rect width="512" height="512" fill="url(#plate)" />
-  <rect width="512" height="512" fill="url(#sheen)" />
-  <rect width="512" height="512" fill="url(#vignette)" />
-
-  <!-- Embossed "Bo." — highlight above-left, shadow below-right, dark face on top -->
-  <g font-family="Helvetica Neue, Helvetica, Liberation Sans, Arial, sans-serif"
-     font-weight="700" font-size="212" letter-spacing="-6" text-anchor="middle">
-    <text x="256" y="332" transform="translate(-2.5,-3)" fill="#ffffff" fill-opacity="0.9">Bo.</text>
-    <text x="256" y="332" transform="translate(3,3.5)" fill="#767e8a" fill-opacity="0.55">Bo.</text>
-    <text x="256" y="332" fill="#2f353d">Bo.</text>
-  </g>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <g filter="url(#emboss)" fill="url(#chrome)"><g transform="translate(187.7 664.7) scale(0.21929 -0.21929)"><path transform="translate(0.0 0)" d="M111 0H742C1081 0 1264 171 1264 420C1264 632 1124 760 942 777V779C1106 820 1209 935 1209 1107C1209 1336 1029 1490 708 1490H111ZM412 242V639H704C859 639 950 561 950 437C950 313 857 242 699 242ZM412 871V1248H685C820 1248 903 1175 903 1059C903 944 820 871 685 871Z"/> <path transform="translate(1279.0 0)" d="M594 -24C915 -24 1131 196 1131 527C1131 858 915 1080 594 1080C274 1080 58 858 58 527C58 196 274 -24 594 -24ZM594 215C451 215 355 331 355 527C355 724 452 841 594 841C737 841 834 724 834 527C834 331 738 215 594 215Z"/> <path transform="translate(2427.1 0)" d="M250 -18C345 -18 420 57 420 152C420 246 345 322 250 322C156 322 81 246 81 152C81 57 156 -18 250 -18Z"/></g></g>
+  <!-- Gloss: a soft highlight across the upper half of the letters -->
+  <rect x="0" y="0" width="1024" height="1024" fill="url(#sheen)" clip-path="url(#textClip)" opacity="0.55"/>
 </svg>
