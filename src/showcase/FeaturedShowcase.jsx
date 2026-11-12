@@ -1,8 +1,5 @@
-import { useState } from "react";
-import { AnimatePresence } from "framer-motion";
 import { categories } from "./projects";
-import CategoryRow from "./CategoryRow";
-import FullscreenShowcase from "./FullscreenShowcase";
+import InlineShowcase from "./InlineShowcase";
 
 const BASEQ_FILE_ID = "1ebXqxCnAy3TL2BxvpFlVpVemqY1XsO9t";
 const BASEQ_VIEW_URL = `https://drive.google.com/file/d/${BASEQ_FILE_ID}/view?usp=sharing`;
@@ -34,9 +31,6 @@ const BASEQ_FEATURES = [
 ];
 
 export default function FeaturedShowcase() {
-  const [open, setOpen] = useState(null);
-  const activeCategory = open && categories.find((c) => c.id === open.categoryId);
-
   return (
     <>
       <div className="px-[clamp(20px,5vw,56px)] pt-[clamp(40px,6vh,76px)]">
@@ -60,13 +54,12 @@ export default function FeaturedShowcase() {
       </div>
 
       <div className="pb-[clamp(24px,4vh,48px)]">
-        {categories.map((category) => (
-          <CategoryRow
-            key={category.id}
-            category={category}
-            onOpen={(index) => setOpen({ categoryId: category.id, index })}
-          />
-        ))}
+        {/* Each subsection shows its projects in place; nothing opens on top. */}
+        <div className="mt-[clamp(24px,4vh,48px)] flex flex-col gap-px">
+          {categories.map((category) => (
+            <InlineShowcase key={category.id} category={category} />
+          ))}
+        </div>
 
         {/* BASE Q: embedded Google Drive file, placed after Bo in Colla"BO"ration. */}
         <div className="py-6 sm:py-8">
@@ -114,17 +107,6 @@ export default function FeaturedShowcase() {
           </div>
         </div>
       </div>
-
-      <AnimatePresence>
-        {activeCategory && (
-          <FullscreenShowcase
-            key={activeCategory.id}
-            category={activeCategory}
-            startIndex={open.index}
-            onClose={() => setOpen(null)}
-          />
-        )}
-      </AnimatePresence>
     </>
   );
 }
