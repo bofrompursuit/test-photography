@@ -83,15 +83,15 @@ export default function StarterProjectSection() {
       <AmbientField />
 
       <div className="relative z-[1]">
-        <header className="relative max-w-4xl">
+        <header className="relative mx-auto max-w-4xl text-center">
           {/* Keeps strands from cutting through the headline and intro. */}
           <div aria-hidden="true" className="starter-text-shield" />
           <Eyebrow>{SECTION.eyebrow}</Eyebrow>
           <AccentTitle title={SECTION.title} />
-          <p className="mt-4 max-w-2xl text-[clamp(0.95rem,1.6vw,1.125rem)] leading-relaxed text-white/55 sm:mt-6">{SECTION.intro}</p>
+          <p className="mx-auto mt-4 max-w-2xl text-[clamp(0.95rem,1.6vw,1.125rem)] leading-relaxed text-white/55 sm:mt-6">{SECTION.intro}</p>
         </header>
 
-        <div className="mt-[clamp(24px,5vh,56px)] max-w-[880px]">
+        <div className="mx-auto mt-[clamp(24px,5vh,56px)] max-w-[880px]">
           <IntakeForm />
         </div>
 
