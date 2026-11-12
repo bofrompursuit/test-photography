@@ -1,5 +1,5 @@
 import { categories } from "./projects";
-import InlineShowcase from "./InlineShowcase";
+import WorkShowcase from "./WorkShowcase";
 
 const BASEQ_FILE_ID = "1ebXqxCnAy3TL2BxvpFlVpVemqY1XsO9t";
 const BASEQ_VIEW_URL = `https://drive.google.com/file/d/${BASEQ_FILE_ID}/view?usp=sharing`;
@@ -54,11 +54,9 @@ export default function FeaturedShowcase() {
       </div>
 
       <div className="pb-[clamp(24px,4vh,48px)]">
-        {/* Each subsection shows its projects in place; nothing opens on top. */}
-        <div className="mt-[clamp(24px,4vh,48px)] flex flex-col gap-px">
-          {categories.map((category) => (
-            <InlineShowcase key={category.id} category={category} />
-          ))}
+        {/* All three subsections in one panel, switched by tabs; nothing opens on top. */}
+        <div className="mt-[clamp(24px,4vh,48px)]">
+          <WorkShowcase categories={categories} />
         </div>
 
         {/* BASE Q: embedded Google Drive file, placed after Bo in Colla"BO"ration. */}

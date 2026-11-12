@@ -40,7 +40,7 @@ function useThumbHeight(ref, count) {
  * background, with its details, a thumbnail strip, a visit link and arrows.
  * Replaces the old card marquee + fullscreen overlay, so nothing opens on top.
  */
-export default function InlineShowcase({ category }) {
+export default function InlineShowcase({ category, tabs = null }) {
   const items = category.items;
   const [index, setIndex] = useState(0);
   const sectionRef = useRef(null);
@@ -50,6 +50,9 @@ export default function InlineShowcase({ category }) {
   const gap = thumbHeight * 0.15;
   const containerRadius = thumbHeight * 0.18;
   const thumbRadius = thumbHeight * 0.1;
+
+  // A new group (tab switch) starts at its first project.
+  useEffect(() => setIndex(0), [category.id]);
 
   const go = useCallback(
     (delta) => setIndex((i) => (i + delta + items.length) % items.length),
@@ -77,7 +80,8 @@ export default function InlineShowcase({ category }) {
     }
   };
 
-  const active = items[index];
+  // Guard the one render between a tab switch and the index reset.
+  const active = items[index] ?? items[0];
 
   return (
     <section
@@ -108,10 +112,13 @@ export default function InlineShowcase({ category }) {
 
       {/* Category header + active project details */}
       <div className="w-full">
-        <h3 className="text-[0.7rem] uppercase tracking-[0.2em] text-white/60">
-          {category.title}
-        </h3>
-        <p className="mx-auto mt-1 text-sm text-white/50">{category.subtitle}</p>
+        {/* With tabs, the tab row names the group; without, a plain heading does. */}
+        {tabs ?? (
+          <h3 className="text-[0.7rem] uppercase tracking-[0.2em] text-white/60">
+            {category.title}
+          </h3>
+        )}
+        <p className="mx-auto mt-2 text-sm text-white/55">{category.subtitle}</p>
 
         <div className="mt-6 min-h-[7.5rem] sm:mt-8 sm:min-h-[9rem]">
           <AnimatePresence mode="wait">
