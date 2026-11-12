@@ -4,12 +4,11 @@ import { motion, useReducedMotion } from "framer-motion";
 /**
  * Apple Wallet-style stack. At rest the passes overlap so only each header
  * shows and the last pass is fully visible. Tapping a pass brings it to the
- * top, fully open, and tucks the others into a thin stack beneath it; tapping
+ * top, fully open, and tucks the others beneath it, headers showing; tapping
  * its header again puts it back. No scroll pinning: the stack sits in the page.
  */
 
 const PEEK = 60; // px of header each stacked pass shows
-const TUCK = 14; // px of edge each tucked pass shows under the open one
 const TUCK_GAP = 16; // px between the open pass and the tucked stack
 
 // Wallet pass proportions: one phone-width column, taller than wide.
@@ -117,12 +116,12 @@ export default function StackedCards({ panels }) {
     if (open === null) return i * PEEK;
     if (i === open) return 0;
     const order = i < open ? i : i - 1; // position among the tucked passes
-    return cardHeight + TUCK_GAP + order * TUCK;
+    return cardHeight + TUCK_GAP + order * PEEK; // full header shows, so it can be tapped
   });
   const height =
     open === null
       ? (count - 1) * PEEK + cardHeight
-      : cardHeight + TUCK_GAP + (count - 2) * TUCK + PEEK;
+      : cardHeight + TUCK_GAP + (count - 1) * PEEK;
 
   const choose = (i) => {
     setOpen((current) => (current === i ? null : i));
@@ -134,13 +133,15 @@ export default function StackedCards({ panels }) {
     }
   };
 
-  // Tucked passes stack in reverse so the nearest one sits on top, as in Wallet.
-  const zFor = (i) => (open === null ? i : i === open ? count + 1 : count - i);
+  // Each lower pass sits over the one above, leaving that one's header visible.
+  const zFor = (i) => (i === open ? count + 1 : i);
 
   return (
     <motion.div
       ref={wrapperRef}
-      className="relative mx-auto w-full"
+      // Clip to the stack: tucked passes are full height and must not spill
+      // into the section below.
+      className="relative mx-auto w-full overflow-hidden rounded-[22px]"
       style={{ maxWidth: PASS_MAX_WIDTH }}
       initial={false}
       animate={{ height }}
