@@ -46,11 +46,11 @@ const LOOKBOOK_LINK = (
 export default function FeaturedShowcase() {
   return (
     <>
-      <div className="px-[clamp(20px,5vw,56px)] pt-[clamp(40px,6vh,76px)]">
+      <div className="px-[clamp(20px,5vw,56px)] pt-[clamp(40px,6vh,76px)] text-center">
         <h2 className="text-[clamp(1.8rem,4vw,2.75rem)] font-semibold tracking-tight text-white">
           Tech Lookbook + Services
         </h2>
-        <p className="mt-3 max-w-2xl text-white/50">
+        <p className="mx-auto mt-3 max-w-2xl text-white/50">
           Building automated workflows and smart AI tools that optimize finance
           workflows, eliminate operational bottlenecks, and help teams grow together.
         </p>

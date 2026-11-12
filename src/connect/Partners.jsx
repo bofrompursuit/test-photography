@@ -38,7 +38,7 @@ const PARTNERS = [
 export default function Partners() {
   return (
     <div className="px-[clamp(20px,5vw,56px)] pt-[clamp(48px,8vh,96px)]">
-      <h2 className="text-[clamp(1.4rem,3vw,2rem)] font-semibold tracking-tight text-white">
+      <h2 className="text-center text-[clamp(1.4rem,3vw,2rem)] font-semibold tracking-tight text-white">
         Powered by{" "}
         <a
           href={PURSUIT_URL}

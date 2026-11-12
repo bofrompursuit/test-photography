@@ -179,13 +179,13 @@ export default function ConnectSection() {
 
   return (
     <>
-      <div className="px-[clamp(20px,5vw,56px)] pt-[clamp(40px,6vh,76px)]">
+      <div className="px-[clamp(20px,5vw,56px)] pt-[clamp(40px,6vh,76px)] text-center">
         {/* Header only — the navbar link stays "Contact" so #connect still
             matches what the visitor clicked. */}
         <h2 className="text-[clamp(1.8rem,4vw,2.75rem)] font-semibold tracking-tight text-white">
           Stay in touch
         </h2>
-        <p className="mt-3 max-w-2xl text-white/55">
+        <p className="mx-auto mt-3 max-w-2xl text-white/55">
           I lead with problem-solving to architect solutions powered by cutting-edge
           technology. Reach out anytime with questions.
         </p>
