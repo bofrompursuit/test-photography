@@ -27,9 +27,30 @@ const LINKS = [
   },
 ];
 
+// OneNote's brand purple, used for the Contact pass: white fields and a white
+// send button on purple, like OneNote's own app chrome.
+export const ONENOTE_PURPLE = "#7719AA";
+export const ONENOTE_THEME = {
+  background: ONENOTE_PURPLE,
+  foreground: "#ffffff",
+  divider: "rgba(255,255,255,0.22)",
+  font: '"Segoe UI", "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif',
+};
+
+// Linktree's brand lime and forest green, used for the Connect pass, with
+// white pill links like a Linktree page.
+export const LINKTREE_LIME = "#D2E823";
+export const LINKTREE_FOREST = "#254F1A";
+export const LINKTREE_THEME = {
+  background: LINKTREE_LIME,
+  foreground: LINKTREE_FOREST,
+  divider: "rgba(37,79,26,0.2)",
+  font: '"Helvetica Neue", Helvetica, Arial, system-ui, sans-serif',
+};
+
 const fieldBase =
-  "w-full rounded-lg border bg-black/60 px-3.5 py-2.5 text-sm text-white transition " +
-  "placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-white/60";
+  "w-full rounded-lg border bg-white px-3.5 py-2.5 text-sm text-neutral-900 transition " +
+  "placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#7719AA]";
 
 function validate(values) {
   const errors = {};
@@ -88,10 +109,15 @@ export function ContactCard({ idPrefix = "cf" }) {
   };
 
   const fieldClass = (key) =>
-    `${fieldBase} ${errors[key] ? "border-rose-400/70" : "border-white/25 hover:border-white/45"}`;
+    `${fieldBase} ${errors[key] ? "border-[#FFB3C7] ring-2 ring-[#FFB3C7]" : "border-transparent"}`;
 
   return (
-    <form onSubmit={onSubmit} noValidate className="space-y-4">
+    <form
+      onSubmit={onSubmit}
+      noValidate
+      className="space-y-4 text-white"
+      style={{ fontFamily: ONENOTE_THEME.font }}
+    >
       <Field
         id={`${idPrefix}-name`}
         label="Name"
@@ -157,17 +183,18 @@ export function ContactCard({ idPrefix = "cf" }) {
         data-cursor-target
         disabled={status === "sending"}
         aria-busy={status === "sending" || undefined}
-        className="w-full rounded-lg border border-white/40 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:border-white/70 hover:bg-white/20 hover:shadow-[0_0_26px_-4px_rgba(255,255,255,0.55)] focus:outline-none focus:ring-2 focus:ring-white/70 active:scale-[0.99] disabled:cursor-wait disabled:opacity-60"
+        style={{ color: ONENOTE_PURPLE }}
+        className="w-full rounded-lg bg-white px-4 py-3 text-sm font-bold transition hover:bg-white/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#7719AA] active:scale-[0.99] disabled:cursor-wait disabled:opacity-60"
       >
         {status === "sending" ? "Sending…" : status === "sent" ? "Sent ✓" : "Send inquiry"}
       </button>
 
       <p role="status" aria-live="polite" className="min-h-[1.25rem] text-xs">
         {status === "sent" && (
-          <span className="text-white/70">Thanks, your message is in. I'll get back to you soon.</span>
+          <span className="text-white/90">Thanks, your message is in. I'll get back to you soon.</span>
         )}
         {status === "error" && (
-          <span className="text-rose-300">
+          <span className="font-medium text-[#FFD1DE]">
             That didn't send. Please try again, or email {CONTACT_EMAIL}.
           </span>
         )}
@@ -181,13 +208,13 @@ function Field({ id, label, error, children }) {
     <div>
       <label
         htmlFor={id}
-        className="mb-1.5 block text-[0.7rem] font-medium uppercase tracking-[0.18em] text-white/70"
+        className="mb-1.5 block text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-white/85"
       >
         {label}
       </label>
       {children}
       {error && (
-        <p id={`${id}-err`} className="mt-1.5 text-xs text-rose-300">
+        <p id={`${id}-err`} className="mt-1.5 text-xs font-medium text-[#FFD1DE]">
           {error}
         </p>
       )}
@@ -354,7 +381,7 @@ export function ContentNeedsCard() {
 
 export function ConnectCard() {
   return (
-    <ul className="space-y-3">
+    <ul className="space-y-3" style={{ fontFamily: LINKTREE_THEME.font }}>
       {LINKS.map((link) => (
         <li key={link.url}>
           <motion.a
@@ -365,15 +392,14 @@ export function ConnectCard() {
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.985 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="group flex items-center justify-between gap-3 rounded-lg border border-white/25 bg-black/50 px-4 py-4 transition-colors hover:border-white/70 hover:bg-white/10 hover:shadow-[0_0_26px_-8px_rgba(255,255,255,0.6)] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+            style={{ color: LINKTREE_FOREST }}
+            className="group flex items-center justify-between gap-3 rounded-full bg-white px-6 py-3.5 shadow-[0_2px_0_rgba(37,79,26,0.15)] transition-colors hover:bg-white/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#254F1A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#D2E823]"
           >
             <span className="min-w-0">
-              <span className="block text-sm font-semibold text-white">
-                {link.label}
-              </span>
-              <span className="block truncate text-xs text-white/60">{link.handle}</span>
+              <span className="block text-sm font-bold">{link.label}</span>
+              <span className="block truncate text-xs opacity-70">{link.handle}</span>
             </span>
-            <span className="shrink-0 text-white/70 transition group-hover:translate-x-0.5">
+            <span className="shrink-0 opacity-80 transition group-hover:translate-x-0.5">
               ↗
             </span>
           </motion.a>

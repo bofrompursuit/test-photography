@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ContactCard, ContributeCard, ConnectCard, ContentNeedsCard, FORTH_THEME, VENMO_THEME } from "./cards";
+import { ContactCard, ContributeCard, ConnectCard, ContentNeedsCard, FORTH_THEME, VENMO_THEME, ONENOTE_THEME, LINKTREE_THEME } from "./cards";
 import StackedCards from "./StackedCards";
 import CustomCursor from "./CustomCursor";
 import Partners from "./Partners";
-import { STATUES } from "./marble";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -27,7 +26,7 @@ const PANELS = [
     id: "contact",
     label: "Contact",
     blurb: "Start a conversation.",
-    statue: STATUES.contact,
+    theme: ONENOTE_THEME,
     Card: ContactCard,
   },
   {
@@ -41,7 +40,7 @@ const PANELS = [
     id: "connect",
     label: "Connect",
     blurb: "Find me elsewhere.",
-    statue: STATUES.connect,
+    theme: LINKTREE_THEME,
     Card: ConnectCard,
   },
   {
