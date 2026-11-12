@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ContactCard, ContributeCard, ConnectCard } from "./cards";
+import { ContactCard, ContributeCard, ConnectCard, ContentNeedsCard, FORTH_THEME } from "./cards";
 import StackedCards from "./StackedCards";
 import CustomCursor from "./CustomCursor";
 import Partners from "./Partners";
@@ -43,6 +43,13 @@ const PANELS = [
     blurb: "Find me elsewhere.",
     statue: STATUES.connect,
     Card: ConnectCard,
+  },
+  {
+    id: "content-needs",
+    label: "Content Needs",
+    blurb: "Forth Studios",
+    theme: FORTH_THEME,
+    Card: ContentNeedsCard,
   },
 ];
 

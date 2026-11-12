@@ -283,6 +283,57 @@ export function ContributeCard() {
   );
 }
 
+// Forth Studios' own brand, matched from forth-studios.vercel.app.
+export const FORTH_URL = "https://forth-studios.vercel.app/";
+export const FORTH_THEME = {
+  background: "#FFC800",
+  foreground: "#000000",
+  font: '"Archivo", "Helvetica Neue", Arial, sans-serif',
+  mono: '"Courier Prime", "Courier New", Courier, monospace',
+};
+
+export function ContentNeedsCard() {
+  return (
+    <div className="flex h-full flex-col text-black" style={{ fontFamily: FORTH_THEME.font }}>
+      <p
+        className="text-[0.7rem] uppercase tracking-[0.2em] text-black/70"
+        style={{ fontFamily: FORTH_THEME.mono }}
+      >
+        Forth Studios
+      </p>
+      <p
+        className="mt-3 text-[clamp(3.25rem,17vw,4.75rem)] font-black uppercase leading-[0.85] tracking-tight"
+        style={{ fontStretch: "125%" }}
+      >
+        Forth
+      </p>
+      <p className="mt-5 text-xl font-extrabold uppercase leading-[1.05] tracking-tight">
+        Photography, storytelling &amp; AI content
+      </p>
+
+      <motion.a
+        href={FORTH_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-cursor-target
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.985 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="mt-auto flex min-h-[52px] items-center justify-between rounded-xl bg-black px-5 text-sm font-bold uppercase tracking-[0.08em] text-[#FFC800] focus:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-[#FFC800]"
+      >
+        <span>Visit Forth Studios</span>
+        <span aria-hidden="true">↗</span>
+      </motion.a>
+      <p
+        className="mt-2.5 text-center text-xs text-black/60"
+        style={{ fontFamily: FORTH_THEME.mono }}
+      >
+        forth-studios.vercel.app
+      </p>
+    </div>
+  );
+}
+
 export function ConnectCard() {
   return (
     <ul className="space-y-3">

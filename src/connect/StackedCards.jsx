@@ -11,13 +11,23 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const PEEK = 60; // px of header each waiting card shows below the active one
 const LAND_STEP = 14; // px each landed card sits below the previous, so its edge shows
-const MAX_STAGE = 760; // px; the deck never grows taller than this
-const MIN_STAGE = 440; // px; below this (landscape phones) the deck becomes a plain list
 const SCROLL_PER_CARD = 0.85; // scroll distance per card, as a fraction of the stage height
 const GAP_BELOW_HEADER = 16; // px between the fixed site header and the pinned deck
 
+// Apple Wallet pass proportions: one phone-width column, taller than wide.
+// The deck keeps this shape on every screen; on desktop it simply sits centred.
+export const PASS_MAX_WIDTH = 400; // px
+const PASS_RATIO = 1.5; // height / width
+const PASS_MIN_HEIGHT = 500; // px; enough for the contact form without scrolling inside the card
+
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 const pad = (n) => String(n + 1).padStart(2, "0");
+
+/** Width of the pass column, matching the deck container's own max-width and page gutters. */
+function passWidth() {
+  const gutter = clamp(window.innerWidth * 0.05, 20, 56);
+  return Math.min(PASS_MAX_WIDTH, window.innerWidth - gutter * 2);
+}
 
 /**
  * Stage geometry. `null` means "render the plain list".
@@ -31,9 +41,13 @@ function useStage(count) {
   const measure = () => {
     const headerH = document.querySelector("[data-header]")?.offsetHeight ?? 72;
     const top = headerH + GAP_BELOW_HEADER;
-    const height = Math.min(window.innerHeight - top - 24, MAX_STAGE);
-    if (reduce || height < MIN_STAGE) return null;
-    return { top, height, cardHeight: height - (count - 1) * PEEK };
+    const available = window.innerHeight - top - 24;
+    const cardHeight = Math.max(PASS_MIN_HEIGHT, Math.round(passWidth() * PASS_RATIO));
+    const height = cardHeight + (count - 1) * PEEK;
+    // Too short to show a full pass plus the peeking headers (landscape phones):
+    // fall back to the same passes stacked in flow.
+    if (reduce || height > available) return null;
+    return { top, height, cardHeight };
   };
   const [stage, setStage] = useState(measure);
 
@@ -53,7 +67,18 @@ function useStage(count) {
   return stage;
 }
 
-function Backdrop({ statue, lit }) {
+function Backdrop({ panel, lit }) {
+  const { statue, theme } = panel;
+  // Branded passes bring their own solid colour instead of the marble photo.
+  if (theme) {
+    return (
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 transition-[filter] duration-300"
+        style={{ background: theme.background, filter: lit ? "none" : "brightness(0.8)" }}
+      />
+    );
+  }
   return (
     <div
       aria-hidden="true"
@@ -72,26 +97,40 @@ function Backdrop({ statue, lit }) {
 }
 
 /** Numbered header strip; the only part of a waiting card that shows. */
-function CardHeader({ index, label, blurb }) {
+function CardHeader({ index, panel }) {
+  const { label, blurb, theme } = panel;
   return (
     <header
-      className="relative flex shrink-0 items-center justify-between gap-4 border-b border-white/10 bg-black/35 px-5 backdrop-blur-sm sm:px-7"
-      style={{ height: PEEK }}
+      className={`relative flex shrink-0 items-center justify-between gap-3 border-b px-5 ${
+        theme ? "border-black/15" : "border-white/10 bg-black/35 backdrop-blur-sm"
+      }`}
+      style={{ height: PEEK, color: theme?.foreground }}
     >
-      <h3 className="flex items-baseline gap-3 text-sm font-semibold uppercase tracking-[0.28em] text-white sm:text-base">
-        <span className="tabular-nums text-white/50">{pad(index)}</span>
+      <h3
+        className={`flex items-baseline gap-3 text-sm font-semibold uppercase tracking-[0.28em] ${theme ? "" : "text-white"}`}
+        style={theme ? { fontFamily: theme.font } : undefined}
+      >
+        <span className={`tabular-nums ${theme ? "opacity-55" : "text-white/50"}`}>{pad(index)}</span>
         {label}
       </h3>
-      <p className="hidden text-sm text-white/60 sm:block">{blurb}</p>
+      {/* Pass-style header: the blurb sits on the right like a wallet card's field. */}
+      <p className={`truncate text-xs ${theme ? "opacity-70" : "text-white/60"}`}>{blurb}</p>
     </header>
   );
 }
 
 function CardBody({ panel }) {
-  const { id, Card } = panel;
+  const { id, Card, theme } = panel;
+  if (theme) {
+    return (
+      <div className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-6">
+        <Card idPrefix={`connect-${id}`} />
+      </div>
+    );
+  }
   return (
-    <div className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain bg-black/50 px-5 py-6 backdrop-blur-[2px] sm:px-8 sm:py-8">
-      <div className="mx-auto w-full max-w-md rounded-2xl border border-white/15 bg-black/55 p-6 shadow-2xl backdrop-blur-md sm:p-8">
+    <div className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain bg-black/50 px-4 py-5 backdrop-blur-[2px]">
+      <div className="w-full rounded-2xl border border-white/15 bg-black/55 p-5 shadow-2xl backdrop-blur-md">
         <Card idPrefix={`connect-${id}`} />
       </div>
     </div>
@@ -120,10 +159,10 @@ function DeckCard({ panel, index, count, progress, stage, isActive, onJump }) {
     <motion.section
       aria-label={panel.label}
       style={{ y, scale, zIndex: index, height: cardHeight, transformOrigin: "50% 0%" }}
-      className="absolute inset-x-0 top-0 flex flex-col overflow-hidden rounded-2xl bg-[var(--surface)] shadow-[0_-12px_40px_rgba(0,0,0,0.55)] ring-1 ring-white/10 ring-inset will-change-transform"
+      className="absolute inset-x-0 top-0 flex flex-col overflow-hidden rounded-[22px] bg-[var(--surface)] shadow-[0_-12px_40px_rgba(0,0,0,0.55)] ring-1 ring-white/10 ring-inset will-change-transform"
     >
-      <Backdrop statue={panel.statue} lit={isActive} />
-      <CardHeader index={index} label={panel.label} blurb={panel.blurb} />
+      <Backdrop panel={panel} lit={isActive} />
+      <CardHeader index={index} panel={panel} />
 
       {/* Only the front card is reachable; the rest are layers to look at. */}
       <div inert={!isActive} aria-hidden={isActive ? undefined : "true"} className="flex min-h-0 flex-1 flex-col">
@@ -223,15 +262,16 @@ export default function StackedCards({ panels }) {
   // Short viewports and reduced motion: the same cards, simply stacked in flow.
   if (!stage) {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="mx-auto flex w-full flex-col gap-4" style={{ maxWidth: PASS_MAX_WIDTH }}>
         {panels.map((panel, index) => (
           <section
             key={panel.id}
             aria-label={panel.label}
-            className="relative flex flex-col overflow-hidden rounded-2xl ring-1 ring-white/10 ring-inset"
+            style={{ minHeight: PASS_MIN_HEIGHT }}
+            className="relative flex aspect-[2/3] flex-col overflow-hidden rounded-[22px] ring-1 ring-white/10 ring-inset"
           >
-            <Backdrop statue={panel.statue} lit />
-            <CardHeader index={index} label={panel.label} blurb={panel.blurb} />
+            <Backdrop panel={panel} lit />
+            <CardHeader index={index} panel={panel} />
             <CardBody panel={panel} />
           </section>
         ))}
@@ -244,7 +284,11 @@ export default function StackedCards({ panels }) {
       ref={wrapperRef}
       onFocus={onFocusIn}
       onBlur={onFocusOut}
-      style={{ height: stage.height + (count - 1) * stage.height * SCROLL_PER_CARD }}
+      className="mx-auto w-full"
+      style={{
+        maxWidth: PASS_MAX_WIDTH,
+        height: stage.height + (count - 1) * stage.height * SCROLL_PER_CARD,
+      }}
     >
       <div className="sticky" style={{ top: stage.top, height: stage.height }}>
         <div className="relative h-full">
