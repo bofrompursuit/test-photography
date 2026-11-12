@@ -12,7 +12,7 @@ gsap.registerPlugin(ScrollTrigger);
 // re-measuring every trigger for that makes the page lurch mid-scroll.
 ScrollTrigger.config({ ignoreMobileResize: true });
 
-// Seconds into intro.mp4 at which the name card lands — tune to match the cut.
+// Seconds into the hero video (orb.mp4) at which the name card lands — tune to match the cut.
 const HERO_REVEAL_AT_SECONDS = 0.2;
 // If the video never starts (blocked autoplay, missing file, no codec support),
 // the hero copy still has to appear.

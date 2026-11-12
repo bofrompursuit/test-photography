@@ -1,70 +1,37 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  motion,
-  useMotionValue,
-  useMotionValueEvent,
-  useReducedMotion,
-  useSpring,
-  useTransform,
-} from "framer-motion";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { motion, useReducedMotion } from "framer-motion";
 
-const PEEK = 60; // px of header each waiting card shows below the active one
-const LAND_STEP = 14; // px each landed card sits below the previous, so its edge shows
-const SCROLL_PER_CARD = 0.85; // scroll distance per card, as a fraction of the stage height
-const GAP_BELOW_HEADER = 16; // px between the fixed site header and the pinned deck
+/**
+ * Apple Wallet-style stack. At rest the passes overlap so only each header
+ * shows and the last pass is fully visible. Tapping a pass brings it to the
+ * top, fully open, and tucks the others into a thin stack beneath it; tapping
+ * its header again puts it back. No scroll pinning: the stack sits in the page.
+ */
 
-// Apple Wallet pass proportions: one phone-width column, taller than wide.
-// The deck keeps this shape on every screen; on desktop it simply sits centred.
+const PEEK = 60; // px of header each stacked pass shows
+const TUCK = 14; // px of edge each tucked pass shows under the open one
+const TUCK_GAP = 16; // px between the open pass and the tucked stack
+
+// Wallet pass proportions: one phone-width column, taller than wide.
 export const PASS_MAX_WIDTH = 400; // px
 const PASS_RATIO = 1.5; // height / width
 const PASS_MIN_HEIGHT = 500; // px; enough for the contact form without scrolling inside the card
 
-const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 const pad = (n) => String(n + 1).padStart(2, "0");
 
-/** Width of the pass column, matching the deck container's own max-width and page gutters. */
-function passWidth() {
-  const gutter = clamp(window.innerWidth * 0.05, 20, 56);
-  return Math.min(PASS_MAX_WIDTH, window.innerWidth - gutter * 2);
-}
-
-/**
- * Stage geometry. `null` means "render the plain list".
- *
- * Re-measured only when the width changes: on phones the soft keyboard and the
- * collapsing address bar change the height constantly, and rebuilding the deck
- * for those threw the visitor out of the form they were typing in.
- */
-function useStage(count) {
-  const reduce = useReducedMotion();
-  const measure = () => {
-    const headerH = document.querySelector("[data-header]")?.offsetHeight ?? 72;
-    const top = headerH + GAP_BELOW_HEADER;
-    const available = window.innerHeight - top - 24;
-    const cardHeight = Math.max(PASS_MIN_HEIGHT, Math.round(passWidth() * PASS_RATIO));
-    const height = cardHeight + (count - 1) * PEEK;
-    // Too short to show a full pass plus the peeking headers (landscape phones):
-    // fall back to the same passes stacked in flow.
-    if (reduce || height > available) return null;
-    return { top, height, cardHeight };
-  };
-  const [stage, setStage] = useState(measure);
-
+function usePassHeight(ref) {
+  const [height, setHeight] = useState(PASS_MIN_HEIGHT);
   useEffect(() => {
-    let width = window.innerWidth;
-    const update = () => setStage(measure());
-    const onResize = () => {
-      if (window.innerWidth === width) return;
-      width = window.innerWidth;
-      update();
-    };
-    update();
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, [reduce, count]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  return stage;
+    const el = ref.current;
+    if (!el) return undefined;
+    const measure = () =>
+      setHeight(Math.max(PASS_MIN_HEIGHT, Math.round(el.clientWidth * PASS_RATIO)));
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [ref]);
+  return height;
 }
 
 function Backdrop({ panel, lit }) {
@@ -137,175 +104,99 @@ function CardBody({ panel }) {
   );
 }
 
-function DeckCard({ panel, index, count, progress, stage, isActive, onJump }) {
-  const { cardHeight } = stage;
-
-  // Waiting: header strips stacked under the active card, sliding up one PEEK
-  // per card as the deck advances. Arriving: slides from the top of that stack
-  // to its landing spot. Landed: stays put while later cards cover it.
-  const y = useTransform(progress, (p) => {
-    const land = index * LAND_STEP;
-    if (index === 0) return 0;
-    if (p <= index - 1) return cardHeight + (index - 1 - p) * PEEK;
-    if (p < index) return land + (cardHeight - land) * (index - p);
-    return land;
-  });
-  // Covered cards recede: shrink from the top edge and darken.
-  const depth = useTransform(progress, (p) => clamp(p - index, 0, 2));
-  const scale = useTransform(depth, (d) => 1 - d * 0.05);
-  const shade = useTransform(depth, (d) => Math.min(d, 1) * 0.6);
-
-  return (
-    <motion.section
-      aria-label={panel.label}
-      style={{ y, scale, zIndex: index, height: cardHeight, transformOrigin: "50% 0%" }}
-      className="absolute inset-x-0 top-0 flex flex-col overflow-hidden rounded-[22px] bg-[var(--surface)] shadow-[0_-12px_40px_rgba(0,0,0,0.55)] ring-1 ring-white/10 ring-inset will-change-transform"
-    >
-      <Backdrop panel={panel} lit={isActive} />
-      <CardHeader index={index} panel={panel} />
-
-      {/* Only the front card is reachable; the rest are layers to look at. */}
-      <div inert={!isActive} aria-hidden={isActive ? undefined : "true"} className="flex min-h-0 flex-1 flex-col">
-        <CardBody panel={panel} />
-      </div>
-
-      <motion.div aria-hidden="true" style={{ opacity: shade }} className="pointer-events-none absolute inset-0 bg-black" />
-
-      {!isActive && (
-        <button
-          type="button"
-          data-cursor-target
-          onClick={() => onJump(index)}
-          className="absolute inset-0 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white"
-        >
-          <span className="sr-only">Show {panel.label}</span>
-        </button>
-      )}
-    </motion.section>
-  );
-}
-
-/**
- * Sticky card deck: the stage pins under the site header while its wrapper
- * scrolls past, and scroll progress deals the cards one onto the next. Waiting
- * cards peek out below as numbered strips; covered cards shrink and darken.
- */
 export default function StackedCards({ panels }) {
   const count = panels.length;
-  const stage = useStage(count);
   const wrapperRef = useRef(null);
-  const triggerRef = useRef(null);
-  const raw = useMotionValue(0);
-  // A light spring between scroll and cards, so they settle rather than track.
-  const progress = useSpring(raw, { stiffness: 260, damping: 34, mass: 0.6 });
-  const [active, setActive] = useState(0);
-  // True while a field in the front card has focus. The deck holds still until
-  // the visitor leaves the form: no dealing, no snapping, whatever the page
-  // does as the keyboard opens or the browser scrolls the field into view.
-  const locked = useRef(false);
+  const cardHeight = usePassHeight(wrapperRef);
+  const [open, setOpen] = useState(null); // index of the opened pass, or null for the stack
+  const reduce = useReducedMotion();
 
-  useMotionValueEvent(raw, "change", (p) => setActive(clamp(Math.round(p), 0, count - 1)));
+  // Where each pass sits, and which one can be used.
+  const front = open ?? count - 1;
+  const layout = panels.map((_, i) => {
+    if (open === null) return i * PEEK;
+    if (i === open) return 0;
+    const order = i < open ? i : i - 1; // position among the tucked passes
+    return cardHeight + TUCK_GAP + order * TUCK;
+  });
+  const height =
+    open === null
+      ? (count - 1) * PEEK + cardHeight
+      : cardHeight + TUCK_GAP + (count - 2) * TUCK + PEEK;
 
-  useEffect(() => {
-    if (!stage || !wrapperRef.current) return undefined;
-    const trigger = ScrollTrigger.create({
-      trigger: wrapperRef.current,
-      start: `top top+=${stage.top}`,
-      end: `bottom top+=${stage.top + stage.height}`,
-      onUpdate: (self) => {
-        if (!locked.current) raw.set(self.progress * (count - 1));
-      },
-      // Come to rest on a card, never halfway through a deal.
-      snap: {
-        snapTo: (value) =>
-          locked.current ? value : Math.round(value * (count - 1)) / (count - 1),
-        duration: { min: 0.2, max: 0.5 },
-        delay: 0.12,
-        ease: "power2.out",
-      },
-    });
-    triggerRef.current = trigger;
-    raw.set(trigger.progress * (count - 1));
-    return () => {
-      trigger.kill();
-      triggerRef.current = null;
-    };
-  }, [stage, count, raw]);
-
-  const isField = (el) => el?.matches?.("input, textarea, select, [contenteditable='true']");
-
-  const onFocusIn = (event) => {
-    if (isField(event.target)) locked.current = true;
+  const choose = (i) => {
+    setOpen((current) => (current === i ? null : i));
+    // Bring the top of the stack into view if it has scrolled off.
+    const top = wrapperRef.current?.getBoundingClientRect().top ?? 0;
+    const headerH = document.querySelector("[data-header]")?.offsetHeight ?? 72;
+    if (top < headerH) {
+      window.scrollBy({ top: top - headerH - 16, behavior: reduce ? "auto" : "smooth" });
+    }
   };
 
-  const onFocusOut = (event) => {
-    if (isField(event.relatedTarget) && wrapperRef.current?.contains(event.relatedTarget)) return;
-    locked.current = false;
-    // Catch up with wherever the page scrolled to while the form had focus,
-    // then settle on the nearest whole card as the snap would have.
-    const trigger = triggerRef.current;
-    if (!trigger) return;
-    raw.set(trigger.progress * (count - 1));
-    if (trigger.isActive) jumpTo(Math.round(trigger.progress * (count - 1)));
-  };
-
-  const jumpTo = (index) => {
-    const trigger = triggerRef.current;
-    if (!trigger) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    window.scrollTo({
-      top: trigger.start + (trigger.end - trigger.start) * (index / (count - 1)),
-      behavior: reduce ? "auto" : "smooth",
-    });
-  };
-
-  // Short viewports and reduced motion: the same cards, simply stacked in flow.
-  if (!stage) {
-    return (
-      <div className="mx-auto flex w-full flex-col gap-4" style={{ maxWidth: PASS_MAX_WIDTH }}>
-        {panels.map((panel, index) => (
-          <section
-            key={panel.id}
-            aria-label={panel.label}
-            style={{ minHeight: PASS_MIN_HEIGHT }}
-            className="relative flex aspect-[2/3] flex-col overflow-hidden rounded-[22px] ring-1 ring-white/10 ring-inset"
-          >
-            <Backdrop panel={panel} lit />
-            <CardHeader index={index} panel={panel} />
-            <CardBody panel={panel} />
-          </section>
-        ))}
-      </div>
-    );
-  }
+  // Tucked passes stack in reverse so the nearest one sits on top, as in Wallet.
+  const zFor = (i) => (open === null ? i : i === open ? count + 1 : count - i);
 
   return (
-    <div
+    <motion.div
       ref={wrapperRef}
-      onFocus={onFocusIn}
-      onBlur={onFocusOut}
-      className="mx-auto w-full"
-      style={{
-        maxWidth: PASS_MAX_WIDTH,
-        height: stage.height + (count - 1) * stage.height * SCROLL_PER_CARD,
-      }}
+      className="relative mx-auto w-full"
+      style={{ maxWidth: PASS_MAX_WIDTH }}
+      initial={false}
+      animate={{ height }}
+      transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 300, damping: 34 }}
     >
-      <div className="sticky" style={{ top: stage.top, height: stage.height }}>
-        <div className="relative h-full">
-          {panels.map((panel, index) => (
-            <DeckCard
-              key={panel.id}
-              panel={panel}
-              index={index}
-              count={count}
-              progress={progress}
-              stage={stage}
-              isActive={index === active}
-              onJump={jumpTo}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
+      {panels.map((panel, index) => {
+        const isFront = index === front;
+        return (
+          <motion.section
+            key={panel.id}
+            aria-label={panel.label}
+            initial={false}
+            animate={{ y: layout[index] }}
+            transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 300, damping: 34 }}
+            style={{ zIndex: zFor(index), height: cardHeight }}
+            className="absolute inset-x-0 top-0 flex flex-col overflow-hidden rounded-[22px] bg-[var(--surface)] shadow-[0_-8px_28px_rgba(0,0,0,0.5)] ring-1 ring-white/10 ring-inset"
+          >
+            <Backdrop panel={panel} lit />
+            <div className="relative">
+              <CardHeader index={index} panel={panel} />
+              {/* Header tap: open this pass, or put the open one back. */}
+              <button
+                type="button"
+                data-cursor-target
+                onClick={() => choose(index)}
+                aria-expanded={open === index}
+                className="absolute inset-0 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white"
+              >
+                <span className="sr-only">
+                  {open === index ? `Close ${panel.label}` : `Open ${panel.label}`}
+                </span>
+              </button>
+            </div>
+
+            {/* Only the front pass is usable; the rest are layers to tap. */}
+            <div
+              inert={!isFront}
+              aria-hidden={isFront ? undefined : "true"}
+              className="flex min-h-0 flex-1 flex-col"
+            >
+              <CardBody panel={panel} />
+            </div>
+
+            {!isFront && (
+              <button
+                type="button"
+                tabIndex={-1}
+                onClick={() => choose(index)}
+                className="absolute inset-0 top-[60px] cursor-pointer"
+              >
+                <span className="sr-only">Open {panel.label}</span>
+              </button>
+            )}
+          </motion.section>
+        );
+      })}
+    </motion.div>
   );
 }

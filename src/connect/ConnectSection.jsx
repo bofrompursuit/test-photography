@@ -8,7 +8,7 @@ import Partners from "./Partners";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const VIDEO_SRC = "/assets/video/orb.mp4";
+const VIDEO_SRC = "/assets/video/intro.mp4"; // outro (swapped with the hero intro)
 // "Inspired" by Kevin MacLeod (incompetech.com), licensed under Creative
 // Commons Attribution 4.0 — attribution is rendered in the footer overlay
 // below, required by the license.
