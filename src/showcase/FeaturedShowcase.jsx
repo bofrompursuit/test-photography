@@ -60,8 +60,9 @@ export default function FeaturedShowcase() {
         </div>
 
         {/* BASE Q: embedded Google Drive file, placed after Bo in Colla"BO"ration. */}
-        <div className="py-6 sm:py-8">
-          <div className="px-[clamp(20px,5vw,56px)]">
+        {/* Phones: text then video, stacked. Desktop: text left, video right. */}
+        <div className="px-[clamp(20px,5vw,56px)] py-6 sm:py-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-center lg:gap-12">
+          <div>
             <h3 className="text-xl font-semibold tracking-tight text-white sm:text-2xl">
               PROJECT BASE Q
             </h3>
@@ -91,8 +92,8 @@ export default function FeaturedShowcase() {
               ))}
             </ul>
           </div>
-          <div className="mt-4 px-[clamp(20px,5vw,56px)] sm:mt-5">
-            <div className="relative aspect-video w-full max-w-5xl overflow-hidden rounded-2xl bg-black ring-1 ring-white/10 ring-inset">
+          <div className="mt-4 sm:mt-5 lg:mt-0">
+            <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black ring-1 ring-white/10 ring-inset">
               {/* Native player: plays inline on phones, with the browser's own
                   fullscreen button. faststart MP4 so it streams before fully loading. */}
               <video
