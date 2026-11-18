@@ -164,6 +164,13 @@ export default function FeaturedShowcase() {
               >
                 Try the live demo ↗
               </a>
+              {/* Public demo login, shown so visitors know what to type. */}
+              <span className="text-sm text-white/50">
+                Sign in with{" "}
+                <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[0.8em] text-white/85">demo</code>
+                {" / "}
+                <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[0.8em] text-white/85">demo</code>
+              </span>
             </div>
             <p className="mt-4 max-w-3xl text-white/70">
               Built in three days for Everytown&rsquo;s Community Safety Fund, where the
