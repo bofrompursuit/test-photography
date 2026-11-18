@@ -30,7 +30,23 @@ const BASEQ_FEATURES = [
   },
 ];
 
-const OCI_DEMO_URL = "https://bofrompursuit.github.io/everytown-oci/";
+// Public demo build (runs in the browser, no AWS); ?demo=org fills in the demo sign-in.
+const OCI_DEMO_URL = "https://everytown-oci-demo.vercel.app/login/?demo=org";
+const OPS_DEMO_URL = "https://ops-inventory-reorder-dashboard.vercel.app";
+const OPS_FEATURES = [
+  {
+    title: "Low-stock alerts",
+    text: "Flags out-of-stock and low items across every warehouse before they hold up an order.",
+  },
+  {
+    title: "Smart reorder suggestions",
+    text: "Recommends how much to order from daily usage and each supplier's lead time.",
+  },
+  {
+    title: "One-click purchase orders",
+    text: "Drafts the reorder email for each supplier, ready to copy or open in your email app.",
+  },
+];
 const OCI_FEATURES = [
   {
     title: "A 15-minute check-in",
@@ -166,7 +182,7 @@ export default function FeaturedShowcase() {
               </a>
               {/* Public demo login, shown so visitors know what to type. */}
               <span className="text-sm text-white/50">
-                Sign in with{" "}
+                Sign-in filled in for you:{" "}
                 <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[0.8em] text-white/85">demo</code>
                 {" / "}
                 <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[0.8em] text-white/85">demo</code>
@@ -198,6 +214,62 @@ export default function FeaturedShowcase() {
                 playsInline
                 preload="metadata"
                 aria-label="OCI Capacity Coach explainer video"
+                className="absolute inset-0 h-full w-full object-contain"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Case study: Ops Inventory, placed after Everytown. Text left, video right on desktop. */}
+        <div className="mx-[clamp(20px,5vw,56px)] border-t border-white/10 py-6 sm:py-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-center lg:gap-12">
+          <div>
+            <h3 className="text-xl font-semibold tracking-tight text-white sm:text-2xl">
+              Case Study: Ops Inventory
+            </h3>
+            <p className="mt-2 max-w-3xl text-base font-medium text-white/85">
+              Know what&rsquo;s running low, what to reorder and who to email, at a glance.
+            </p>
+            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3">
+              <a
+                href="#starter-project"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-medium text-black transition hover:bg-white/85"
+              >
+                Start a project
+                <span aria-hidden="true">→</span>
+              </a>
+              <a
+                href={OPS_DEMO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-white/50 transition-colors hover:text-white"
+              >
+                Try the live demo ↗
+              </a>
+            </div>
+            <p className="mt-4 max-w-3xl text-white/70">
+              Ops Inventory replaces reorder spreadsheets with one dashboard across every
+              warehouse. It powers:
+            </p>
+            <ul className="mt-3 max-w-3xl space-y-2 text-sm leading-relaxed text-white/60 sm:text-base">
+              {OPS_FEATURES.map((f) => (
+                <li key={f.title} className="flex gap-2.5">
+                  <span aria-hidden="true" className="mt-[0.6em] h-1 w-1 shrink-0 rounded-full bg-white/50" />
+                  <span>
+                    <span className="font-medium text-white/90">{f.title}:</span> {f.text}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="mt-4 sm:mt-5 lg:mt-0">
+            <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black ring-1 ring-white/10 ring-inset">
+              <video
+                src="/assets/video/ops-inventory.mp4"
+                poster="/assets/poster/ops-inventory.jpg"
+                controls
+                playsInline
+                preload="metadata"
+                aria-label="Ops Inventory explainer video"
                 className="absolute inset-0 h-full w-full object-contain"
               />
             </div>
