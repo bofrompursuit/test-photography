@@ -30,6 +30,22 @@ const BASEQ_FEATURES = [
   },
 ];
 
+const OCI_DEMO_URL = "https://bofrompursuit.github.io/everytown-oci/";
+const OCI_FEATURES = [
+  {
+    title: "A 15-minute check-in",
+    text: "Simple Yes or No questions anyone on the team can answer.",
+  },
+  {
+    title: "Transparent scoring",
+    text: "A fixed scoring method rates each capacity area, so results are consistent and explainable.",
+  },
+  {
+    title: "A plan for what to grow next",
+    text: "Claude on Amazon Bedrock turns the scores into a 12-week roadmap and a shareable PDF report.",
+  },
+];
+
 const LOOKBOOK_LINK = (
   <a
     href="https://lookbook.pursuit.org/people/bo-moldenhauer"
@@ -116,6 +132,64 @@ export default function FeaturedShowcase() {
                 playsInline
                 preload="metadata"
                 aria-label="BaseQ walkthrough video"
+                className="absolute inset-0 h-full w-full object-contain"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Case study: Everytown, placed after BaseQ. Same layout; the video is
+            vertical (9:16), so it sits in a phone-width frame instead of a wide one. */}
+        <div className="mx-[clamp(20px,5vw,56px)] border-t border-white/10 py-6 sm:py-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)] lg:items-center lg:gap-12">
+          <div>
+            <h3 className="text-xl font-semibold tracking-tight text-white sm:text-2xl">
+              EVERYTOWN: OCI Capacity Coach
+            </h3>
+            <p className="mt-2 max-w-3xl text-base font-medium text-white/85">
+              NYC track winner and Finalist at AWS Breaking Barriers 2026: AI for Good.
+            </p>
+            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3">
+              <a
+                href="#starter-project"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-medium text-black transition hover:bg-white/85"
+              >
+                Start a project
+                <span aria-hidden="true">→</span>
+              </a>
+              <a
+                href={OCI_DEMO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-white/50 transition-colors hover:text-white"
+              >
+                Try the live demo ↗
+              </a>
+            </div>
+            <p className="mt-4 max-w-3xl text-white/70">
+              Built in three days for Everytown&rsquo;s Community Safety Fund, where the
+              same few people run the programs, raise the money, keep the books and
+              report to funders. The coach gives them:
+            </p>
+            <ul className="mt-3 max-w-3xl space-y-2 text-sm leading-relaxed text-white/60 sm:text-base">
+              {OCI_FEATURES.map((f) => (
+                <li key={f.title} className="flex gap-2.5">
+                  <span aria-hidden="true" className="mt-[0.6em] h-1 w-1 shrink-0 rounded-full bg-white/50" />
+                  <span>
+                    <span className="font-medium text-white/90">{f.title}:</span> {f.text}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="mx-auto mt-5 w-full max-w-[340px] lg:mt-0">
+            <div className="relative aspect-[9/16] w-full overflow-hidden rounded-2xl bg-black ring-1 ring-white/10 ring-inset">
+              <video
+                src="/assets/video/oci-capacity-coach.mp4"
+                poster="/assets/poster/oci-capacity-coach.jpg"
+                controls
+                playsInline
+                preload="metadata"
+                aria-label="OCI Capacity Coach explainer video"
                 className="absolute inset-0 h-full w-full object-contain"
               />
             </div>
