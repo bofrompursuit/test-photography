@@ -140,7 +140,7 @@ export default function FeaturedShowcase() {
 
         {/* Case study: Everytown, placed after BaseQ. Same layout; the video is
             vertical (9:16), so it sits in a phone-width frame instead of a wide one. */}
-        <div className="mx-[clamp(20px,5vw,56px)] border-t border-white/10 py-6 sm:py-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)] lg:items-center lg:gap-12">
+        <div className="mx-[clamp(20px,5vw,56px)] border-t border-white/10 py-6 sm:py-8 lg:grid lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:items-center lg:gap-12">
           <div>
             <h3 className="text-xl font-semibold tracking-tight text-white sm:text-2xl">
               EVERYTOWN: OCI Capacity Coach
@@ -181,7 +181,8 @@ export default function FeaturedShowcase() {
               ))}
             </ul>
           </div>
-          <div className="mx-auto mt-5 w-full max-w-[340px] lg:mt-0">
+          {/* Desktop: video on the left. Phones: still below the text. */}
+          <div className="mx-auto mt-5 w-full max-w-[340px] lg:order-first lg:mt-0">
             <div className="relative aspect-[9/16] w-full overflow-hidden rounded-2xl bg-black ring-1 ring-white/10 ring-inset">
               <video
                 src="/assets/video/oci-capacity-coach.mp4"
